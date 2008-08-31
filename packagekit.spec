@@ -4,7 +4,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.2.4
+Version:	0.3.1
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -96,7 +96,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sbindir}/packagekitd
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/*.so
-%{_libexecdir}/pk-import-*
+%{_libexecdir}/pk-*
 %{_mandir}/man1/*
 %{_libdir}/pm-utils/sleep.d/95packagekit
 %{_libexecdir}/PackageKitDbusTest.py
