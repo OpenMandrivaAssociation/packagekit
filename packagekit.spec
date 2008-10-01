@@ -1,24 +1,26 @@
-%define major 6
+%define major 8
 %define libname %mklibname %name %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.3.3
+Version:	0.3.5
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
+Patch0:		pk-fix-cancel-at-speed-unlucky.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
 BuildRequires:	dbus-glib-devel
 BuildRequires:	sqlite3-devel
 BuildRequires:	intltool
-BuildRequires:	polkit-devel
+BuildRequires:	polkit-devel >= 0.8
 BuildRequires:	docbook-utils
 BuildRequires:	libxslt-proc
 BuildRequires:	xmlto
+BuildRequires:	xulrunner-devel
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -60,8 +62,18 @@ Requires: %{name} = %{version}-%{release}
 %description cron
 Crontab and utilities for running PackageKit as a cron job.
 
+%package browser-plugin
+Summary: Browser Plugin for PackageKit
+Group: System/Configuration/Packaging
+
+%description browser-plugin
+The PackageKit browser plugin allows web sites to offer the ability to
+users to install and update packages from configured repositories
+using PackageKit.
+
 %prep
 %setup -q -n PackageKit-%version
+%patch0 -p1
 
 %build
 %configure2_5x --disable-static \
@@ -95,11 +107,19 @@ rm -rf $RPM_BUILD_ROOT
 %{python_sitelib}/packagekit
 %{_sbindir}/packagekitd
 %dir %{_libdir}/packagekit-backend
-%{_libdir}/packagekit-backend/*.so
-%{_libexecdir}/pk-*
+%{_libdir}/packagekit-backend/libpk_backend_dummy.so
+%{_libdir}/packagekit-backend/libpk_backend_smart.so
+%{_libdir}/packagekit-backend/libpk_backend_test_dbus.so
+%{_libdir}/packagekit-backend/libpk_backend_test_fail.so
+%{_libdir}/packagekit-backend/libpk_backend_test_nop.so
+%{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
+%{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
+%{_libdir}/packagekit-backend/libpk_backend_test_thread.so
+%{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_mandir}/man1/*
 %{_libdir}/pm-utils/sleep.d/95packagekit
 %{_libexecdir}/PackageKitDbusTest.py
+%{_libexecdir}/pk-import-specspo
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 %ghost %verify(not md5 size mtime) %{_var}/run/PackageKit/job_count.dat
 
@@ -124,3 +144,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %config %{_sysconfdir}/cron.daily/*.cron
 %config %{_sysconfdir}/sysconfig/packagekit-background
+
+%files browser-plugin
+%defattr(-,root,root,-)
+%doc README AUTHORS NEWS COPYING
+%{_libdir}/mozilla/plugins/packagekit-plugin.*
