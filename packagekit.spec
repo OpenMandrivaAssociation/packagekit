@@ -4,12 +4,12 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.3.5
+Version:	0.3.6
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
-Patch0:		pk-fix-cancel-at-speed-unlucky.patch
+Patch1:		packagekit-0.3.6-customize-vendor.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -73,7 +73,7 @@ using PackageKit.
 
 %prep
 %setup -q -n PackageKit-%version
-%patch0 -p1
+%patch1 -p0
 
 %build
 %configure2_5x --disable-static \
@@ -96,6 +96,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-, root, root)
 %dir %{_sysconfdir}/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
+%config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
