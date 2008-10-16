@@ -1,10 +1,10 @@
-%define major 8
+%define major 9
 %define libname %mklibname %name %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.3.6
+Version:	0.3.7
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
