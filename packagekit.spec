@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.3.8
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
@@ -50,6 +50,7 @@ Summary: Libraries and headers for PackageKit
 Group: Development/Other
 Requires: %{libname} = %{version}-%{release}
 Provides: %{name}-devel = %{version}-%{release}
+Obsoletes: packagekit-qt-devel < %{version}
 
 %description -n %{develname}
 Headers and libraries for PackageKit.
