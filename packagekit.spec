@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.3.8
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
@@ -26,6 +26,7 @@ BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	xulrunner-devel
 BuildRequires:	gtk-doc
+BuildRequires:	cmake
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -93,16 +94,29 @@ using PackageKit.
 
 %build
 NOCONFIGURE=yes ./autogen.sh
-%configure2_5x --disable-static \
+%configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
 	--enable-smart --enable-urpmi --disable-yum --disable-yum2 --disable-zypp \
 	--with-default-backend=urpmi
 %make
 
+# install cmake modules for packagekit-qt
+(
+cd lib/packagekit-qt/modules
+%cmake
+%make
+)
+
 %install
 rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
+
+# install cmake modules for packagekit-qt
+(
+cd lib/packagekit-qt/modules/build
+%makeinstall_std
+)
 
 %{find_lang} PackageKit
 
@@ -155,6 +169,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.la
 %{_libdir}/packagekit-backend/*.la
 %{_libdir}/pkgconfig/*.pc
+%{_datadir}/cmake-*/Modules/*.cmake
 
 %files -n udev-packagekit
 %defattr(-, root, root)
