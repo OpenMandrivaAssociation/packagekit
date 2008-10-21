@@ -1,15 +1,17 @@
-%define major 9
-%define libname %mklibname %name %major
+%define major 10
+%define libname %mklibname %name-glib %major
+%define qtlib %mklibname %name-qt %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.3.7
+Version:	0.3.8
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
+Patch2:		packagekit-0.3.6-adopt-qt-moc.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -20,6 +22,8 @@ BuildRequires:	polkit-devel >= 0.8
 BuildRequires:	docbook-utils
 BuildRequires:	libxslt-proc
 BuildRequires:	xmlto
+BuildRequires:	qt4-devel
+BuildRequires:	cppunit-devel
 BuildRequires:	xulrunner-devel
 
 %description
@@ -32,6 +36,14 @@ Group: System/Configuration/Packaging
 
 %description -n %{libname}
 Libraries for accessing PackageKit.
+
+%package -n %{qtlib}
+Summary: QT libraries for accessing PackageKit
+Group: System/Configuration/Packaging
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{qtlib}
+QT libraries for accessing PackageKit.
 
 %package -n %{develname}
 Summary: Libraries and headers for PackageKit
@@ -74,8 +86,10 @@ using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
+%patch2 -p0
 
 %build
+NOCONFIGURE=yes ./autogen.sh
 %configure2_5x --disable-static \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
@@ -120,17 +134,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/*
 %{_libdir}/pm-utils/sleep.d/95packagekit
 %{_libexecdir}/PackageKitDbusTest.py
-%{_libexecdir}/pk-import-specspo
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 %ghost %verify(not md5 size mtime) %{_var}/run/PackageKit/job_count.dat
 
 %files -n %{libname}
 %defattr(-, root, root)
-%{_libdir}/*.so.%{major}*
+%{_libdir}/*packagekit-glib*.so.%{major}*
+
+%files -n %{qtlib}
+%defattr(-, root, root)
+%{_libdir}/*packagekit-qt*.so.%{major}*
 
 %files -n %{develname}
 %defattr(-, root, root)
-%{_includedir}/packagekit*
+%{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/*.la
 %{_libdir}/packagekit-backend/*.la
