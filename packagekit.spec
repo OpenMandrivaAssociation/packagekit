@@ -25,6 +25,7 @@ BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	xulrunner-devel
+BuildRequires:	gtk-doc
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -49,6 +50,7 @@ QT libraries for accessing PackageKit.
 Summary: Libraries and headers for PackageKit
 Group: Development/Other
 Requires: %{libname} = %{version}-%{release}
+Requires: %{qtlib} = %{version}-%{release}
 Provides: %{name}-devel = %{version}-%{release}
 Obsoletes: packagekit-qt-devel < %{version}
 
