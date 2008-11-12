@@ -109,6 +109,13 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post
+# the job count used to live in /var/run, but it's now in /var/lib with the
+# other persistent bits
+if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
+	mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
+fi
+
 %files -f PackageKit.lang
 %defattr(-, root, root)
 %dir %{_sysconfdir}/PackageKit
@@ -138,7 +145,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pm-utils/sleep.d/95packagekit
 %{_libexecdir}/PackageKitDbusTest.py
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
-%ghost %verify(not md5 size mtime) %{_var}/run/PackageKit/job_count.dat
+%ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/job_count.dat
 
 %files -n %{libname}
 %defattr(-, root, root)
@@ -155,6 +162,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/*.la
 %{_libdir}/packagekit-backend/*.la
 %{_libdir}/pkgconfig/*.pc
+%{_datadir}/cmake/Modules/*.cmake
 
 %files -n udev-packagekit
 %defattr(-, root, root)
