@@ -1,4 +1,4 @@
-%define major 10
+%define major 11
 %define libname %mklibname %name-glib %major
 %define qtlib %mklibname %name-qt %major
 %define develname %mklibname -d %name
