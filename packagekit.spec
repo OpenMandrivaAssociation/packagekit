@@ -143,6 +143,7 @@ fi
 %dir %{_sysconfdir}/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
+%config(noreplace) %{_sysconfdir}/PackageKit/CommandNotFound.conf
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
