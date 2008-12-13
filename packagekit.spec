@@ -86,6 +86,23 @@ The PackageKit browser plugin allows web sites to offer the ability to
 users to install and update packages from configured repositories
 using PackageKit.
 
+%package command-not-found
+Summary: Ask the user to install command line programs automatically
+Group: System/Configuration/Packaging
+
+%description command-not-found
+A simple helper that offers to install new packages on the command line
+using PackageKit.
+
+%package gtk-module
+Summary: Install fonts automatically using PackageKit
+Group: System/Configuration/Packaging
+Requires: pango
+
+%description gtk-module
+The PackageKit GTK+ module allows any Pango application to install
+fonts from configured repositories using PackageKit.
+
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
@@ -103,6 +120,11 @@ NOCONFIGURE=yes ./autogen.sh
 %install
 rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
+
+rm -f %{buildroot}%{_libdir}/libpackagekit*.la
+rm -f %{buildroot}%{_libdir}/packagekit-backend/*.la
+rm -f %{buildroot}%{_libdir}/mozilla/plugins/packagekit-plugin.la
+rm -f %{buildroot}%{_libdir}/gtk-2.0/modules/*.la
 
 %{find_lang} PackageKit
 
@@ -159,8 +181,6 @@ fi
 %defattr(-, root, root)
 %{_includedir}/PackageKit
 %{_libdir}/*.so
-%{_libdir}/*.la
-%{_libdir}/packagekit-backend/*.la
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/cmake/Modules/*.cmake
 
@@ -178,3 +198,14 @@ fi
 %defattr(-,root,root,-)
 %doc README AUTHORS NEWS COPYING
 %{_libdir}/mozilla/plugins/packagekit-plugin.*
+
+%files command-not-found
+%defattr(-,root,root,-)
+%doc README AUTHORS NEWS COPYING
+%{_sysconfdir}/profile.d/*
+%{_libexecdir}/pk-command-not-found
+
+%files gtk-module
+%defattr(-,root,root,-)
+%doc README AUTHORS NEWS COPYING
+%{_libdir}/gtk-2.0/modules/*.so
