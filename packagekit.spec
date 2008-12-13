@@ -113,7 +113,7 @@ NOCONFIGURE=yes ./autogen.sh
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
-	--enable-smart --enable-urpmi --disable-yum --disable-yum2 --disable-zypp \
+	--enable-smart --enable-urpmi --disable-yum --disable-zypp \
 	--with-default-backend=urpmi
 %make
 
