@@ -109,12 +109,11 @@ fonts from configured repositories using PackageKit.
 %patch2 -p0
 
 %build
-NOCONFIGURE=yes ./autogen.sh
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
 	--enable-smart --enable-urpmi --disable-yum --disable-zypp \
-	--with-default-backend=urpmi
+	--disable-ruck --with-default-backend=urpmi
 %make
 
 %install
