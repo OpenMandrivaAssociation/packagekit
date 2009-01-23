@@ -26,6 +26,7 @@ BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	xulrunner-devel
 BuildRequires:	gtk-doc
+Obsoletes: udev-packagekit < %{version}-%{release}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -56,17 +57,6 @@ Obsoletes: packagekit-qt-devel < %{version}
 
 %description -n %{develname}
 Headers and libraries for PackageKit.
-
-%package -n udev-packagekit
-Summary: Tell PackageKit to install firmware that udev requires
-Group: System/Configuration/Packaging
-Requires: udev
-Requires: %{name} = %{version}-%{release}
-
-%description -n udev-packagekit
-udev-packagekit tells PackageKit that firmware was not available and was
-needed. This allows PackageKit to do the right thing and prompt for
-the firmware to be installed.
 
 %package cron
 Summary: Cron job and related utilities for PackageKit
@@ -183,11 +173,6 @@ fi
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/cmake/Modules/*.cmake
-
-%files -n udev-packagekit
-%defattr(-, root, root)
-%{_sysconfdir}/udev/rules.d/*.rules
-/lib/udev/*.sh
 
 %files cron
 %defattr(-,root,root,-)
