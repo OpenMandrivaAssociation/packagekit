@@ -5,7 +5,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.4.2
+Version:	0.4.3
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -99,6 +99,8 @@ fonts from configured repositories using PackageKit.
 %patch2 -p0
 
 %build
+autoreconf -fis
+export PATH=$PATH:%{qt4bin}
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
