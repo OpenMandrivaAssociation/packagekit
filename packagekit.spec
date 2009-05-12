@@ -5,7 +5,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.4.6
+Version:	0.4.7
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -148,7 +148,7 @@ fi
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
 %{_libdir}/packagekit-backend/libpk_backend_smart.so
-%{_libdir}/packagekit-backend/libpk_backend_test_dbus.so
+#{_libdir}/packagekit-backend/libpk_backend_test_dbus.so
 %{_libdir}/packagekit-backend/libpk_backend_test_fail.so
 %{_libdir}/packagekit-backend/libpk_backend_test_nop.so
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
@@ -157,9 +157,9 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_mandir}/man1/*
 %{_libdir}/pm-utils/sleep.d/95packagekit
-%{_libexecdir}/PackageKitDbusTest.py
+#{_libexecdir}/PackageKitDbusTest.py
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
-%ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/job_count.dat
+#ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/job_count.dat
 
 %files -n %{libname}
 %defattr(-, root, root)
