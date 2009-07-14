@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.4.8
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
@@ -16,6 +16,7 @@ URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
 BuildRequires:	dbus-glib-devel
+BuildRequires:	libarchive-devel
 BuildRequires:	sqlite3-devel
 BuildRequires:	intltool
 BuildRequires:	polkit-devel >= 0.8
