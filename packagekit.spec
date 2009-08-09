@@ -1,17 +1,17 @@
-%define major 11
+%define major 12
 %define libname %mklibname %name-glib %major
 %define qtlib %mklibname %name-qt %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.4.8
-Release:	%mkrel 2
+Version:	0.5.1
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch2:		packagekit-0.3.6-adopt-qt-moc.patch
+Patch2:		packagekit-0.5.1-adopt-qt-moc.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -19,13 +19,14 @@ BuildRequires:	dbus-glib-devel
 BuildRequires:	libarchive-devel
 BuildRequires:	sqlite3-devel
 BuildRequires:	intltool
-BuildRequires:	polkit-devel >= 0.8
+BuildRequires:	polkit-1-devel >= 0.92
 BuildRequires:	docbook-utils
 BuildRequires:	libxslt-proc
 BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
-BuildRequires:	xulrunner-devel
+# re-enable when we have ff 3.5
+#BuildRequires:	xulrunner-devel
 BuildRequires:	gtk-doc
 Obsoletes: udev-packagekit < %{version}-%{release}
 
@@ -68,6 +69,8 @@ Requires: %{name} = %{version}-%{release}
 %description cron
 Crontab and utilities for running PackageKit as a cron job.
 
+# re-enalbe when we have ff 3.5
+%if 0
 %package browser-plugin
 Summary: Browser Plugin for PackageKit
 Group: System/Configuration/Packaging
@@ -76,6 +79,7 @@ Group: System/Configuration/Packaging
 The PackageKit browser plugin allows web sites to offer the ability to
 users to install and update packages from configured repositories
 using PackageKit.
+%endif
 
 %package command-not-found
 Summary: Ask the user to install command line programs automatically
@@ -100,7 +104,7 @@ fonts from configured repositories using PackageKit.
 %patch2 -p0
 
 %build
-autoreconf -fis
+autoreconf -fi
 export PATH=$PATH:%{qt4bin}
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
@@ -113,10 +117,7 @@ export PATH=$PATH:%{qt4bin}
 rm -rf $RPM_BUILD_ROOT
 %makeinstall_std
 
-rm -f %{buildroot}%{_libdir}/libpackagekit*.la
-rm -f %{buildroot}%{_libdir}/packagekit-backend/*.la
-rm -f %{buildroot}%{_libdir}/mozilla/plugins/packagekit-plugin.la
-rm -f %{buildroot}%{_libdir}/gtk-2.0/modules/*.la
+find %{buildroot} -name *.la | xargs rm
 
 %{find_lang} PackageKit
 
@@ -140,7 +141,8 @@ fi
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
 %{_datadir}/PackageKit
-%{_datadir}/PolicyKit/policy/*.policy
+%{_datadir}/polkit-1/actions/*.policy
+%{_libdir}/polkit-1/extensions/libpackagekit-action-lookup.so
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/mime/packages/*.xml
@@ -149,7 +151,6 @@ fi
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
 %{_libdir}/packagekit-backend/libpk_backend_smart.so
-#{_libdir}/packagekit-backend/libpk_backend_test_dbus.so
 %{_libdir}/packagekit-backend/libpk_backend_test_fail.so
 %{_libdir}/packagekit-backend/libpk_backend_test_nop.so
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
@@ -157,10 +158,7 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_mandir}/man1/*
-%{_libdir}/pm-utils/sleep.d/95packagekit
-#{_libexecdir}/PackageKitDbusTest.py
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
-#ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/job_count.dat
 
 %files -n %{libname}
 %defattr(-, root, root)
@@ -182,10 +180,12 @@ fi
 %config %{_sysconfdir}/cron.daily/*.cron
 %config %{_sysconfdir}/sysconfig/packagekit-background
 
+%if 0
 %files browser-plugin
 %defattr(-,root,root,-)
 %doc README AUTHORS NEWS COPYING
 %{_libdir}/mozilla/plugins/packagekit-plugin.*
+%endif
 
 %files command-not-found
 %defattr(-,root,root,-)
