@@ -25,6 +25,7 @@ BuildRequires:	libxslt-proc
 BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
+BuildRequires:	gtk+2-devel
 # re-enable when we have ff 3.5
 #BuildRequires:	xulrunner-devel
 BuildRequires:	gtk-doc
