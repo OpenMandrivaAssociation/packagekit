@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.5.1
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
@@ -26,8 +26,7 @@ BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	gtk+2-devel
-# re-enable when we have ff 3.5
-#BuildRequires:	xulrunner-devel
+BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 Obsoletes: udev-packagekit < %{version}-%{release}
 
@@ -70,8 +69,6 @@ Requires: %{name} = %{version}-%{release}
 %description cron
 Crontab and utilities for running PackageKit as a cron job.
 
-# re-enalbe when we have ff 3.5
-%if 0
 %package browser-plugin
 Summary: Browser Plugin for PackageKit
 Group: System/Configuration/Packaging
@@ -80,7 +77,6 @@ Group: System/Configuration/Packaging
 The PackageKit browser plugin allows web sites to offer the ability to
 users to install and update packages from configured repositories
 using PackageKit.
-%endif
 
 %package command-not-found
 Summary: Ask the user to install command line programs automatically
@@ -181,12 +177,10 @@ fi
 %config %{_sysconfdir}/cron.daily/*.cron
 %config %{_sysconfdir}/sysconfig/packagekit-background
 
-%if 0
 %files browser-plugin
 %defattr(-,root,root,-)
 %doc README AUTHORS NEWS COPYING
 %{_libdir}/mozilla/plugins/packagekit-plugin.*
-%endif
 
 %files command-not-found
 %defattr(-,root,root,-)
