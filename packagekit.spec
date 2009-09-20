@@ -5,13 +5,12 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.5.1
-Release:	%mkrel 2
+Version:	0.5.2
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.gz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch2:		packagekit-0.5.1-adopt-qt-moc.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -26,6 +25,8 @@ BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	gtk+2-devel
+BuildRequires:	pm-utils-devel
+BuildRequires:	libgudev-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 Obsoletes: udev-packagekit < %{version}-%{release}
@@ -98,11 +99,8 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
-%patch2 -p0
 
 %build
-autoreconf -fi
-export PATH=$PATH:%{qt4bin}
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
@@ -140,11 +138,13 @@ fi
 %{_datadir}/PackageKit
 %{_datadir}/polkit-1/actions/*.policy
 %{_libdir}/polkit-1/extensions/libpackagekit-action-lookup.so
+%{_libdir}/pm-utils/sleep.d/95packagekit
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/mime/packages/*.xml
 %{python_sitelib}/packagekit
 %{_sbindir}/packagekitd
+%{_sbindir}/pk-device-rebind
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
 %{_libdir}/packagekit-backend/libpk_backend_smart.so
