@@ -1,16 +1,18 @@
-%define major 12
+%define major 13
 %define libname %mklibname %name-glib %major
 %define qtlib %mklibname %name-qt %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.5.5
+Version:	0.6.0
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
+# (fc) 0.6.0-1mdv fix urpmi backend API
+Patch2:		PackageKit-0.6.0-fixurpmiapi.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -100,6 +102,7 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
+%patch2 -p1 -b .fixurpmiapi
 
 %build
 %configure2_5x --disable-static --disable-gstreamer-plugin \
