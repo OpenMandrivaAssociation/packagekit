@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.0
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
@@ -32,6 +32,7 @@ BuildRequires:	libgudev-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 Suggests:	%{name}-gtk-module = %{version}
+Suggests:	packagekit-gui
 Obsoletes: udev-packagekit < %{version}-%{release}
 
 %description
