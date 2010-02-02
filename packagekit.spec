@@ -5,14 +5,13 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.0
-Release:	%mkrel 2
+Version:	0.6.1
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-# (fc) 0.6.0-1mdv fix urpmi backend API
-Patch2:		PackageKit-0.6.0-fixurpmiapi.patch
+Patch3:		packagekit-0.6.1-link.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -103,7 +102,7 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
-%patch2 -p1 -b .fixurpmiapi
+%patch3 -p0
 
 %build
 %configure2_5x --disable-static --disable-gstreamer-plugin \
