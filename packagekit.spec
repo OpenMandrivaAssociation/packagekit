@@ -1,11 +1,11 @@
-%define major 13
+%define major 14
 %define libname %mklibname %name-glib %major
 %define qtlib %mklibname %name-qt %major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.1
+Version:	0.6.2
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -102,7 +102,7 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
-%patch3 -p0
+#%patch3 -p0
 
 %build
 %configure2_5x --disable-static --disable-gstreamer-plugin \
@@ -164,6 +164,8 @@ fi
 %files -n %{libname}
 %defattr(-, root, root)
 %{_libdir}/*packagekit-glib*.so.%{major}*
+%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
+%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 
 %files -n %{qtlib}
 %defattr(-, root, root)
@@ -183,16 +185,13 @@ fi
 
 %files browser-plugin
 %defattr(-,root,root,-)
-%doc README AUTHORS NEWS COPYING
 %{_libdir}/mozilla/plugins/packagekit-plugin.*
 
 %files command-not-found
 %defattr(-,root,root,-)
-%doc README AUTHORS NEWS COPYING
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
 
 %files gtk-module
 %defattr(-,root,root,-)
-%doc README AUTHORS NEWS COPYING
 %{_libdir}/gtk-2.0/modules/*.so
