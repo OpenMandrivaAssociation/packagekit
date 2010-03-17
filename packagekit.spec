@@ -164,8 +164,6 @@ fi
 %files -n %{libname}
 %defattr(-, root, root)
 %{_libdir}/*packagekit-glib*.so.%{major}*
-%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
-%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 
 %files -n %{qtlib}
 %defattr(-, root, root)
