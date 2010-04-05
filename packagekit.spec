@@ -5,13 +5,12 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.2
+Version:	0.6.3
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch3:		packagekit-0.6.1-link.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -102,7 +101,6 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
-#%patch3 -p0
 
 %build
 %configure2_5x --disable-static --disable-gstreamer-plugin \
@@ -113,7 +111,7 @@ fonts from configured repositories using PackageKit.
 %make
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 %makeinstall_std
 
 find %{buildroot} -name *.la | xargs rm
@@ -121,7 +119,7 @@ find %{buildroot} -name *.la | xargs rm
 %{find_lang} PackageKit
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %post
 # the job count used to live in /var/run, but it's now in /var/lib with the
@@ -164,6 +162,8 @@ fi
 %files -n %{libname}
 %defattr(-, root, root)
 %{_libdir}/*packagekit-glib*.so.%{major}*
+%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
+%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 
 %files -n %{qtlib}
 %defattr(-, root, root)
