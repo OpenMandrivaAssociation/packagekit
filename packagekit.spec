@@ -29,6 +29,7 @@ BuildRequires:	pm-utils-devel
 BuildRequires:	libgudev-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
+BuildRequires:	gobject-introspection
 Suggests:	%{name}-gtk-module = %{version}
 Suggests:	packagekit-gui
 Obsoletes: udev-packagekit < %{version}-%{release}
