@@ -106,7 +106,8 @@ fonts from configured repositories using PackageKit.
 %configure2_5x --disable-static --disable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
-	--enable-smart --enable-urpmi --disable-yum --disable-zypp \
+	--enable-smart --enable-urpmi --enable-introspection \
+	--disable-yum --disable-zypp \
 	--disable-ruck --with-default-backend=urpmi
 %make
 
