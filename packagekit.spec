@@ -30,6 +30,7 @@ BuildRequires:	libgudev-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 BuildRequires:	gobject-introspection
+BuildRequires:	gobject-introspection-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
 #Suggests:	%{name}-gtk-module = %{version}
 Suggests:	packagekit-gui
