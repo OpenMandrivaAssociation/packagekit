@@ -6,11 +6,12 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.3
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
+Patch2:		packagekit-fix-perform_updates-params.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 %py_requires -d
@@ -104,6 +105,7 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%version
 %patch1 -p0
+%patch2 -p1
 
 %build
 %configure2_5x --disable-static --disable-gstreamer-plugin \
