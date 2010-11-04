@@ -5,15 +5,15 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.9
-Release:	%mkrel 3
+Version:	0.6.10
+Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-%py_requires -d
+BuildRequires:	python-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	libarchive-devel
 BuildRequires:	sqlite3-devel
@@ -31,6 +31,7 @@ BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 BuildRequires:	gobject-introspection
 BuildRequires:	gobject-introspection-devel
+BuildRequires:	libgstreamer-plugins-base-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
 #Suggests:	%{name}-gtk-module = %{version}
 Suggests:	packagekit-gui
@@ -75,6 +76,15 @@ Requires: %{name} = %{version}-%{release}
 %description cron
 Crontab and utilities for running PackageKit as a cron job.
 
+%package gstreamer-plugin
+Summary: Install GStreamer codecs using PackageKit
+Group: System/Configuration/Packaging
+Requires: gstreamer0.10-tools
+
+%description gstreamer-plugin
+The PackageKit GStreamer plugin allows any Gstreamer application to install
+codecs from configured repositories using PackageKit.
+
 %package browser-plugin
 Summary: Browser Plugin for PackageKit
 Group: System/Configuration/Packaging
@@ -106,7 +116,7 @@ fonts from configured repositories using PackageKit.
 %patch1 -p0
 
 %build
-%configure2_5x --disable-static --disable-gstreamer-plugin \
+%configure2_5x --disable-static --enable-gstreamer-plugin \
 	--disable-alpm --disable-apt --disable-box --disable-conary \
 	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
 	--enable-smart --enable-urpmi --enable-introspection \
@@ -119,6 +129,11 @@ rm -rf %{buildroot}
 %makeinstall_std
 
 find %{buildroot} -name *.la | xargs rm
+
+# create a link that GStreamer will recognise
+pushd %buildroot%{_libexecdir}
+ln -s pk-gstreamer-install gst-install-plugins-helper
+popd
 
 %{find_lang} PackageKit
 
@@ -186,6 +201,11 @@ fi
 %defattr(-,root,root,-)
 %config %{_sysconfdir}/cron.daily/*.cron
 %config %{_sysconfdir}/sysconfig/packagekit-background
+
+%files gstreamer-plugin
+%defattr(-,root,root,-)
+%{_libexecdir}/pk-gstreamer-install
+%{_libexecdir}/gst-install-plugins-helper
 
 %files browser-plugin
 %defattr(-,root,root,-)
