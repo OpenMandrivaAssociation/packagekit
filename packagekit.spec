@@ -6,7 +6,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.10
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
@@ -80,6 +80,9 @@ Crontab and utilities for running PackageKit as a cron job.
 Summary: Install GStreamer codecs using PackageKit
 Group: System/Configuration/Packaging
 Requires: gstreamer0.10-tools
+Requires(post): update-alternatives
+Requires(postun): update-alternatives
+Provides: gst-install-plugins-helper
 
 %description gstreamer-plugin
 The PackageKit GStreamer plugin allows any Gstreamer application to install
@@ -129,11 +132,6 @@ rm -rf %{buildroot}
 %makeinstall_std
 
 find %{buildroot} -name *.la | xargs rm
-
-# create a link that GStreamer will recognise
-pushd %buildroot%{_libexecdir}
-ln -s pk-gstreamer-install gst-install-plugins-helper
-popd
 
 %{find_lang} PackageKit
 
@@ -205,7 +203,16 @@ fi
 %files gstreamer-plugin
 %defattr(-,root,root,-)
 %{_libexecdir}/pk-gstreamer-install
-%{_libexecdir}/gst-install-plugins-helper
+
+%post gstreamer-plugin
+update-alternatives --install %{_libexecdir}/gst-install-plugins-helper gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install 10
+
+%postun gstreamer-plugin
+if [ "$1" = "0" ]; then
+    if ! [ -e %{_libexecdir}/pk-gstreamer-install ]; then
+        update-alternatives --remove gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install
+    fi
+fi
 
 %files browser-plugin
 %defattr(-,root,root,-)
