@@ -5,7 +5,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.11
+Version:	0.6.12
 Release:	%mkrel 1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -35,7 +35,7 @@ BuildRequires:	libgstreamer-plugins-base-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
 #Suggests:	%{name}-gtk-module = %{version}
 Suggests:	packagekit-gui
-Obsoletes: udev-packagekit < %{version}-%{release}
+Obsoletes: 	udev-packagekit < %{version}-%{release}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -119,16 +119,15 @@ fonts from configured repositories using PackageKit.
 %patch1 -p0
 
 %build
-%configure2_5x --disable-static --enable-gstreamer-plugin \
-	--disable-alpm --disable-apt --disable-box --disable-conary \
-	--enable-dummy --disable-opkg --disable-pisi --disable-poldek \
-	--enable-smart --enable-urpmi --enable-introspection \
-	--disable-yum --disable-zypp \
-	--with-default-backend=urpmi
+%configure2_5x --disable-static \
+    --enable-gstreamer-plugin \
+    --enable-smart \
+    --enable-urpmi \
+    --enable-introspection \
+    --with-default-backend=urpmi
 %make
 
 %install
-rm -rf %{buildroot}
 %makeinstall_std
 
 find %{buildroot} -name *.la | xargs rm
