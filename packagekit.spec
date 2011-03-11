@@ -32,6 +32,7 @@ BuildRequires:	gtk-doc
 BuildRequires:	gobject-introspection
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	libgstreamer-plugins-base-devel
+BuildRequires:	NetworkManager-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
 #Suggests:	%{name}-gtk-module = %{version}
 Suggests:	packagekit-gui
@@ -157,7 +158,6 @@ fi
 %{_bindir}/*
 %{_datadir}/PackageKit
 %{_datadir}/polkit-1/actions/*.policy
-%{_libdir}/polkit-1/extensions/libpackagekit-action-lookup.so
 %{_libdir}/pm-utils/sleep.d/95packagekit
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
