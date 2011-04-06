@@ -151,7 +151,10 @@ fi
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/CommandNotFound.conf
+%dir %{_sysconfdir}/PackageKit/events
+%dir %{_sysconfdir}/PackageKit/events/post-transaction.d
 %{_sysconfdir}/PackageKit/events/post-transaction.d/README
+%dir %{_sysconfdir}/PackageKit/events/pre-transaction.d
 %{_sysconfdir}/PackageKit/events/pre-transaction.d/README
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
