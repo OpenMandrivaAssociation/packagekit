@@ -1,6 +1,8 @@
 %define major 14
 %define libname %mklibname %name-glib %major
 %define qtlib %mklibname %name-qt %major
+%define qt2major 2
+%define qt2lib %mklibname %name-qt2_ %qt2major
 %define develname %mklibname -d %name
 
 Summary:	A DBUS packaging abstraction layer
@@ -57,11 +59,20 @@ Requires: %{name} = %{version}-%{release}
 %description -n %{qtlib}
 QT libraries for accessing PackageKit.
 
+%package -n %{qt2lib}
+Summary: QT libraries for accessing PackageKit
+Group: System/Configuration/Packaging
+Requires: %{name} = %{version}-%{release}
+
+%description -n %{qt2lib}
+QT libraries for accessing PackageKit.
+
 %package -n %{develname}
 Summary: Libraries and headers for PackageKit
 Group: Development/Other
 Requires: %{libname} = %{version}-%{release}
 Requires: %{qtlib} = %{version}-%{release}
+Requires: %{qt2lib} = %{version}-%{release}
 Provides: %{name}-devel = %{version}-%{release}
 Obsoletes: packagekit-qt-devel < %{version}
 
@@ -188,7 +199,11 @@ fi
 
 %files -n %{qtlib}
 %defattr(-, root, root)
-%{_libdir}/*packagekit-qt*.so.%{major}*
+%{_libdir}/libpackagekit-qt.so.%{major}*
+
+%files -n %{qt2lib}
+%defattr(-, root, root)
+%{_libdir}/libpackagekit-qt2.so.%{qt2major}*
 
 %files -n %{develname}
 %defattr(-, root, root)
