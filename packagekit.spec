@@ -8,7 +8,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.14
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
@@ -189,7 +189,10 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_mandir}/man1/*
+%dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
+%dir %{_var}/cache/PackageKit
+%dir %{_var}/cache/PackageKit/downloads
 
 %files -n %{libname}
 %defattr(-, root, root)
