@@ -160,6 +160,16 @@ if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
 	mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
 fi
 
+%post gstreamer-plugin
+update-alternatives --install %{_libexecdir}/gst-install-plugins-helper gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install 10
+
+%postun gstreamer-plugin
+if [ "$1" = "0" ]; then
+    if ! [ -e %{_libexecdir}/pk-gstreamer-install ]; then
+        update-alternatives --remove gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install
+    fi
+fi
+
 %files -f PackageKit.lang
 %defattr(-, root, root)
 %dir %{_sysconfdir}/PackageKit
@@ -227,16 +237,6 @@ fi
 %files gstreamer-plugin
 %defattr(-,root,root,-)
 %{_libexecdir}/pk-gstreamer-install
-
-%post gstreamer-plugin
-update-alternatives --install %{_libexecdir}/gst-install-plugins-helper gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install 10
-
-%postun gstreamer-plugin
-if [ "$1" = "0" ]; then
-    if ! [ -e %{_libexecdir}/pk-gstreamer-install ]; then
-        update-alternatives --remove gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install
-    fi
-fi
 
 %files browser-plugin
 %defattr(-,root,root,-)
