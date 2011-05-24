@@ -8,7 +8,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.14
-Release:	%mkrel 3
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
@@ -16,7 +16,6 @@ Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch2:		packagekit-0.6.15-what_provides-and-friends.patch
 Patch3:		PackageKit-0.6.14-glib-2.28.7-functionality-missing-bump.patch
 URL:		http://www.packagekit.org
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	python-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	libarchive-devel
@@ -129,7 +128,7 @@ The PackageKit GTK+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
 %prep
-%setup -q -n PackageKit-%version
+%setup -q -n PackageKit-%{version}
 %patch1 -p0
 %patch2 -p1 -b .what_provides~
 %patch3 -p1 -b .glib2.28.7~
@@ -150,9 +149,6 @@ find %{buildroot} -name *.la | xargs rm
 
 %{find_lang} PackageKit
 
-%clean
-rm -rf %{buildroot}
-
 %post
 # the job count used to live in /var/run, but it's now in /var/lib with the
 # other persistent bits
@@ -171,7 +167,6 @@ if [ "$1" = "0" ]; then
 fi
 
 %files -f PackageKit.lang
-%defattr(-, root, root)
 %dir %{_sysconfdir}/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
@@ -209,44 +204,35 @@ fi
 %dir %{_var}/cache/PackageKit/downloads
 
 %files -n %{libname}
-%defattr(-, root, root)
 %{_libdir}/*packagekit-glib*.so.%{major}*
 %{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
 %{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 
 %files -n %{qtlib}
-%defattr(-, root, root)
 %{_libdir}/libpackagekit-qt.so.%{major}*
 
 %files -n %{qt2lib}
-%defattr(-, root, root)
 %{_libdir}/libpackagekit-qt2.so.%{qt2major}*
 
 %files -n %{develname}
-%defattr(-, root, root)
 %{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/cmake/Modules/*.cmake
 
 %files cron
-%defattr(-,root,root,-)
 %config %{_sysconfdir}/cron.daily/*.cron
 %config %{_sysconfdir}/sysconfig/packagekit-background
 
 %files gstreamer-plugin
-%defattr(-,root,root,-)
 %{_libexecdir}/pk-gstreamer-install
 
 %files browser-plugin
-%defattr(-,root,root,-)
 %{_libdir}/mozilla/plugins/packagekit-plugin.*
 
 %files command-not-found
-%defattr(-,root,root,-)
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
 
 %files gtk-module
-%defattr(-,root,root,-)
 %{_libdir}/gtk-2.0/modules/*.so
