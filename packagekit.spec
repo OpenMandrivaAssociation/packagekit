@@ -93,6 +93,7 @@ Crontab and utilities for running PackageKit as a cron job.
 Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	gstreamer0.10-tools
+Requires:	%{name} = %{version}-%{release}
 Requires(post):	update-alternatives
 Requires(postun): update-alternatives
 Provides:	gst-install-plugins-helper
@@ -104,6 +105,7 @@ codecs from configured repositories using PackageKit.
 %package	browser-plugin
 Summary:	Browser Plugin for PackageKit
 Group:		System/Configuration/Packaging
+Requires:	%{name} = %{version}-%{release}
 
 %description	browser-plugin
 The PackageKit browser plugin allows web sites to offer the ability to
@@ -113,6 +115,7 @@ using PackageKit.
 %package	command-not-found
 Summary:	Ask the user to install command line programs automatically
 Group:		System/Configuration/Packaging
+Requires:	%{name} = %{version}-%{release}
 
 %description	command-not-found
 A simple helper that offers to install new packages on the command line
@@ -122,6 +125,7 @@ using PackageKit.
 Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	pango
+Requires:	%{name} = %{version}-%{release}
 
 %description	gtk-module
 The PackageKit GTK+ module allows any Pango application to install
