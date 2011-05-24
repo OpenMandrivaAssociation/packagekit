@@ -14,6 +14,7 @@ Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch2:		packagekit-0.6.15-what_provides-and-friends.patch
+Patch3:		PackageKit-0.6.14-glib-2.28.7-functionality-missing-bump.patch
 URL:		http://www.packagekit.org
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires:	python-devel
@@ -131,6 +132,7 @@ fonts from configured repositories using PackageKit.
 %setup -q -n PackageKit-%version
 %patch1 -p0
 %patch2 -p1 -b .what_provides~
+%patch3 -p1 -b .glib2.28.7~
 
 %build
 %configure2_5x --disable-static \
