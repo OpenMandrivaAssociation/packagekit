@@ -1,9 +1,9 @@
-%define major 14
-%define libname %mklibname %name-glib %major
-%define qtlib %mklibname %name-qt %major
-%define qt2major 2
-%define qt2lib %mklibname %name-qt2_ %qt2major
-%define develname %mklibname -d %name
+%define	major	14
+%define	libname %mklibname %{name}-glib %{major}
+%define	qtlib	%mklibname %{name}-qt %{major}
+%define	qt2major 2
+%define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
+%define	devname	%mklibname -d %{name}
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
@@ -45,85 +45,85 @@ Obsoletes: 	udev-packagekit < %{version}-%{release}
 PackageKit is a DBUS abstraction layer that allows the session user to manage
 packages in a secure way using a cross-distro, cross-architecture API.
 
-%package -n %{libname}
-Summary: Libraries for accessing PackageKit
-Group: System/Configuration/Packaging
+%package -n	%{libname}
+Summary:	Libraries for accessing PackageKit
+Group:		System/Configuration/Packaging
 
-%description -n %{libname}
+%description -n	%{libname}
 Libraries for accessing PackageKit.
 
-%package -n %{qtlib}
-Summary: QT libraries for accessing PackageKit
-Group: System/Configuration/Packaging
-Requires: %{name} = %{version}-%{release}
+%package -n	%{qtlib}
+Summary:	QT libraries for accessing PackageKit
+Group:		System/Configuration/Packaging
+Requires:	%{name} = %{version}-%{release}
 
-%description -n %{qtlib}
+%description -n	%{qtlib}
 QT libraries for accessing PackageKit.
 
-%package -n %{qt2lib}
-Summary: QT libraries for accessing PackageKit
-Group: System/Configuration/Packaging
-Requires: %{name} = %{version}-%{release}
+%package -n	%{qt2lib}
+Summary:	QT libraries for accessing PackageKit
+Group:		System/Configuration/Packaging
+Requires:	%{name} = %{version}-%{release}
 
-%description -n %{qt2lib}
+%description -n	%{qt2lib}
 QT libraries for accessing PackageKit.
 
-%package -n %{develname}
-Summary: Libraries and headers for PackageKit
-Group: Development/Other
-Requires: %{libname} = %{version}-%{release}
-Requires: %{qtlib} = %{version}-%{release}
-Requires: %{qt2lib} = %{version}-%{release}
-Provides: %{name}-devel = %{version}-%{release}
-Obsoletes: packagekit-qt-devel < %{version}
+%package -n	%{devname}
+Summary:	Libraries and headers for PackageKit
+Group:		Development/Other
+Requires:	%{libname} = %{version}-%{release}
+Requires:	%{qtlib} = %{version}-%{release}
+Requires:	%{qt2lib} = %{version}-%{release}
+Provides:	%{name}-devel = %{version}-%{release}
+Obsoletes:	packagekit-qt-devel < %{version}
 
-%description -n %{develname}
+%description -n	%{devname}
 Headers and libraries for PackageKit.
 
-%package cron
-Summary: Cron job and related utilities for PackageKit
-Group: System/Configuration/Packaging
-Requires: crontabs
-Requires: %{name} = %{version}-%{release}
+%package	cron
+Summary:	Cron job and related utilities for PackageKit
+Group:		System/Configuration/Packaging
+Requires:	crontabs
+Requires:	%{name} = %{version}-%{release}
 
-%description cron
+%description	cron
 Crontab and utilities for running PackageKit as a cron job.
 
-%package gstreamer-plugin
-Summary: Install GStreamer codecs using PackageKit
-Group: System/Configuration/Packaging
-Requires: gstreamer0.10-tools
-Requires(post): update-alternatives
+%package	gstreamer-plugin
+Summary:	Install GStreamer codecs using PackageKit
+Group:		System/Configuration/Packaging
+Requires:	gstreamer0.10-tools
+Requires(post):	update-alternatives
 Requires(postun): update-alternatives
-Provides: gst-install-plugins-helper
+Provides:	gst-install-plugins-helper
 
-%description gstreamer-plugin
+%description	gstreamer-plugin
 The PackageKit GStreamer plugin allows any Gstreamer application to install
 codecs from configured repositories using PackageKit.
 
-%package browser-plugin
-Summary: Browser Plugin for PackageKit
-Group: System/Configuration/Packaging
+%package	browser-plugin
+Summary:	Browser Plugin for PackageKit
+Group:		System/Configuration/Packaging
 
-%description browser-plugin
+%description	browser-plugin
 The PackageKit browser plugin allows web sites to offer the ability to
 users to install and update packages from configured repositories
 using PackageKit.
 
-%package command-not-found
-Summary: Ask the user to install command line programs automatically
-Group: System/Configuration/Packaging
+%package	command-not-found
+Summary:	Ask the user to install command line programs automatically
+Group:		System/Configuration/Packaging
 
-%description command-not-found
+%description	command-not-found
 A simple helper that offers to install new packages on the command line
 using PackageKit.
 
-%package gtk-module
-Summary: Install fonts automatically using PackageKit
-Group: System/Configuration/Packaging
-Requires: pango
+%package	gtk-module
+Summary:	Install fonts automatically using PackageKit
+Group:		System/Configuration/Packaging
+Requires:	pango
 
-%description gtk-module
+%description	gtk-module
 The PackageKit GTK+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
@@ -134,12 +134,12 @@ fonts from configured repositories using PackageKit.
 %patch3 -p1 -b .glib2.28.7~
 
 %build
-%configure2_5x --disable-static \
-    --enable-gstreamer-plugin \
-    --enable-smart \
-    --enable-urpmi \
-    --enable-introspection \
-    --with-default-backend=urpmi
+%configure2_5x	--disable-static \
+		--enable-gstreamer-plugin \
+		--enable-smart \
+		--enable-urpmi \
+		--enable-introspection \
+		--with-default-backend=urpmi
 %make
 
 %install
@@ -214,7 +214,7 @@ fi
 %files -n %{qt2lib}
 %{_libdir}/libpackagekit-qt2.so.%{qt2major}*
 
-%files -n %{develname}
+%files -n %{devname}
 %{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
