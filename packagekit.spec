@@ -8,13 +8,14 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.6.14
-Release:	3
+Release:	4
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.bz2
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch2:		packagekit-0.6.15-what_provides-and-friends.patch
 Patch3:		PackageKit-0.6.14-glib-2.28.7-functionality-missing-bump.patch
+Patch4:		PackageKit-0.6.14-libexecdir.patch
 URL:		http://www.packagekit.org
 BuildRequires:	python-devel
 BuildRequires:	dbus-glib-devel
@@ -136,6 +137,7 @@ fonts from configured repositories using PackageKit.
 %patch1 -p0
 %patch2 -p1 -b .what_provides~
 %patch3 -p1 -b .glib2.28.7~
+%patch4 -p0 -b .libexec
 
 %build
 %configure2_5x	--disable-static \
