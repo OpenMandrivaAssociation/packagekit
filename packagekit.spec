@@ -7,8 +7,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.16
-Release:	2
+Version:	0.6.20
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
@@ -240,3 +240,4 @@ fi
 
 %files gtk-module
 %{_libdir}/gtk-2.0/modules/*.so
+%{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
