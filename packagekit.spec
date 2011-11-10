@@ -28,6 +28,7 @@ BuildRequires:	xmlto
 BuildRequires:	qt4-devel
 BuildRequires:	cppunit-devel
 BuildRequires:	gtk+2-devel
+BuildRequires:	gtk+3-devel
 BuildRequires:	pm-utils-devel
 BuildRequires:	libgudev-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
@@ -121,14 +122,24 @@ Requires:	%{name} = %{version}-%{release}
 A simple helper that offers to install new packages on the command line
 using PackageKit.
 
-%package	gtk-module
+%package	gtk2-module
 Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	pango
 Requires:	%{name} = %{version}-%{release}
 
-%description	gtk-module
-The PackageKit GTK+ module allows any Pango application to install
+%description	gtk2-module
+The PackageKit GTK2+ module allows any Pango application to install
+fonts from configured repositories using PackageKit.
+
+%package	gtk3-module
+Summary:	Install fonts automatically using PackageKit
+Group:		System/Configuration/Packaging
+Requires:	pango
+Requires:	%{name} = %{version}-%{release}
+
+%description	gtk3-module
+The PackageKit GTK2+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
 %prep
@@ -238,6 +249,8 @@ fi
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
 
-%files gtk-module
-%{_libdir}/gtk-2.0/modules/*.so
+%files gtk2-module
+%{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
+
+%files gtk3-module
 %{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
