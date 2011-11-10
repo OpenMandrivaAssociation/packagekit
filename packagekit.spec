@@ -39,6 +39,7 @@ BuildRequires:	libgstreamer-plugins-base-devel
 BuildRequires:	NetworkManager-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk-module = %{version}
+Suggests:	%{name}-gtk3-module = %{version}
 Suggests:	packagekit-gui
 Obsoletes: 	udev-packagekit < %{version}-%{release}
 
@@ -122,13 +123,14 @@ Requires:	%{name} = %{version}-%{release}
 A simple helper that offers to install new packages on the command line
 using PackageKit.
 
-%package	gtk2-module
+%package	gtk-module
 Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	pango
 Requires:	%{name} = %{version}-%{release}
+Obsoletes:	%{name}-gtk2-module
 
-%description	gtk2-module
+%description	gtk-module
 The PackageKit GTK2+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
@@ -249,7 +251,7 @@ fi
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
 
-%files gtk2-module
+%files gtk-module
 %{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
 
 %files gtk3-module
