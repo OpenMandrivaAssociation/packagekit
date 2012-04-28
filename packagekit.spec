@@ -1,19 +1,22 @@
 %define	major	14
+
+%define girmajor 1.0
+%define girname_plugin %mklibname packagekitplugin-gir  %{girmajor}
+%define girname_glib %mklibname packagekitglib-gir  %{girmajor}
+
 %define	libname %mklibname %{name}-glib %{major}
-%define	qtlib	%mklibname %{name}-qt %{major}
-%define	qt2major 2
+%define	qt2major 1
 %define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
 %define	devname	%mklibname -d %{name}
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.6.20
-Release:	2
+Version:	0.7.4
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch2:		packagekit-0.6.15-what_provides-and-friends.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
 URL:		http://www.packagekit.org
 BuildRequires:	python-devel
@@ -30,18 +33,19 @@ BuildRequires:	cppunit-devel
 BuildRequires:	gtk+2-devel
 BuildRequires:	gtk+3-devel
 BuildRequires:	pm-utils-devel
-BuildRequires:	libgudev-devel
+BuildRequires:	pkgconfig(gudev-1.0)
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	gtk-doc
 BuildRequires:	gobject-introspection
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	libgstreamer-plugins-base-devel
-BuildRequires:	NetworkManager-devel
+#BuildRequires:	networkmanager-devel
 # fonts package in Mandriva do not have needed provides yet to be useful
-Suggests:	%{name}-gtk-module = %{version}
 Suggests:	%{name}-gtk3-module = %{version}
 Suggests:	packagekit-gui
 Obsoletes: 	udev-packagekit < %{version}-%{release}
+# No gtk2 plugin anymore
+Obsoletes:  packagekit-gtk-module
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -54,13 +58,19 @@ Group:		System/Configuration/Packaging
 %description -n	%{libname}
 Libraries for accessing PackageKit.
 
-%package -n	%{qtlib}
-Summary:	QT libraries for accessing PackageKit
-Group:		System/Configuration/Packaging
-Requires:	%{name} = %{version}-%{release}
+%package -n %{girname_plugin}
+Summary:    GObject Introspection interface library for %{name} plugin
+Group:      System/Libraries
 
-%description -n	%{qtlib}
-QT libraries for accessing PackageKit.
+%description -n %{girname_plugin}
+GObject Introspection interface library for %{name} plugin.
+
+%package -n %{girname_glib}
+Summary:    GObject Introspection interface library for %{name} glib
+Group:      System/Libraries
+
+%description -n %{girname_glib}
+GObject Introspection interface library for %{name} glib.
 
 %package -n	%{qt2lib}
 Summary:	QT libraries for accessing PackageKit
@@ -74,7 +84,6 @@ QT libraries for accessing PackageKit.
 Summary:	Libraries and headers for PackageKit
 Group:		Development/Other
 Requires:	%{libname} = %{version}-%{release}
-Requires:	%{qtlib} = %{version}-%{release}
 Requires:	%{qt2lib} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	packagekit-qt-devel < %{version}
@@ -123,17 +132,6 @@ Requires:	%{name} = %{version}-%{release}
 A simple helper that offers to install new packages on the command line
 using PackageKit.
 
-%package	gtk-module
-Summary:	Install fonts automatically using PackageKit
-Group:		System/Configuration/Packaging
-Requires:	pango
-Requires:	%{name} = %{version}-%{release}
-Obsoletes:	%{name}-gtk2-module
-
-%description	gtk-module
-The PackageKit GTK2+ module allows any Pango application to install
-fonts from configured repositories using PackageKit.
-
 %package	gtk3-module
 Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
@@ -147,7 +145,6 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -q -n PackageKit-%{version}
 %patch1 -p0
-%patch2 -p1 -b .what_provides~
 %patch4 -p0 -b .libexec~
 
 %build
@@ -219,14 +216,20 @@ fi
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 %dir %{_var}/cache/PackageKit
 %dir %{_var}/cache/PackageKit/downloads
+%{_libdir}/packagekit-plugins/*.so
+%{_datadir}/dbus-1/interfaces/*.xml
 
 %files -n %{libname}
 %{_libdir}/*packagekit-glib*.so.%{major}*
-%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
 %{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
+%{_libdir}/gnome-settings-daemon-3.0/gtk-modules/*.desktop
+%{_datadir}/glib-2.0/schemas/*.gschema.xml
 
-%files -n %{qtlib}
-%{_libdir}/libpackagekit-qt.so.%{major}*
+%files -n %{girname_plugin}
+%{_libdir}/girepository-1.0/PackageKitPlugin-1.0.typelib
+
+%files -n %{girname_glib}
+%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
 
 %files -n %{qt2lib}
 %{_libdir}/libpackagekit-qt2.so.%{qt2major}*
@@ -235,7 +238,9 @@ fi
 %{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_datadir}/cmake/Modules/*.cmake
+%{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config-version.cmake
+%{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config.cmake
+%{_datadir}/gir-1.0/PackageKitPlugin-1.0.gir
 
 %files cron
 %config %{_sysconfdir}/cron.daily/*.cron
@@ -250,9 +255,6 @@ fi
 %files command-not-found
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
-
-%files gtk-module
-%{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
 
 %files gtk3-module
 %{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
