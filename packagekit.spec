@@ -153,7 +153,8 @@ fonts from configured repositories using PackageKit.
 		--enable-smart \
 		--enable-urpmi \
 		--enable-introspection \
-		--with-default-backend=urpmi
+		--with-default-backend=urpmi \
+        --with-security-framework=polkit
 %make
 
 %install
