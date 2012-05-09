@@ -12,40 +12,40 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.7.4
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
+URL:		http://www.packagekit.org
 Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
-URL:		http://www.packagekit.org
-BuildRequires:	python-devel
+
+BuildRequires:	docbook-utils
+BuildRequires:	gtk-doc
+BuildRequires:	intltool
+BuildRequires:	xmlto
+BuildRequires:	xsltproc
+BuildRequires:	cppunit-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	libarchive-devel
-BuildRequires:	sqlite3-devel
-BuildRequires:	intltool
-BuildRequires:	polkit-1-devel >= 0.92
-BuildRequires:	docbook-utils
-BuildRequires:	libxslt-proc
-BuildRequires:	xmlto
-BuildRequires:	qt4-devel
-BuildRequires:	cppunit-devel
-BuildRequires:	gtk+2-devel
-BuildRequires:	gtk+3-devel
-BuildRequires:	pm-utils-devel
-BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	xulrunner-devel >= 1.9.1
-BuildRequires:	gtk-doc
-BuildRequires:	gobject-introspection
-BuildRequires:	gobject-introspection-devel
 BuildRequires:	libgstreamer-plugins-base-devel
+BuildRequires:	polkit-1-devel >= 0.92
+BuildRequires:	pm-utils-devel
+BuildRequires:	qt4-devel
+BuildRequires:	sqlite3-devel
+BuildRequires:	xulrunner-devel >= 1.9.1
+BuildRequires:	pkgconfig(gtk+-2.0)
+BuildRequires:	pkgconfig(gtk+-3.0)
+BuildRequires:	pkgconfig(gudev-1.0)
+BuildRequires:	pkgconfig(gobject-introspection-1.0)
+BuildRequires:	pkgconfig(python)
 #BuildRequires:	networkmanager-devel
+
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
 Suggests:	packagekit-gui
-Obsoletes: 	udev-packagekit < %{version}-%{release}
 # No gtk2 plugin anymore
-Obsoletes:  packagekit-gtk-module
+Obsoletes:	packagekit-gtk-module
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -84,6 +84,8 @@ QT libraries for accessing PackageKit.
 Summary:	Libraries and headers for PackageKit
 Group:		Development/Other
 Requires:	%{libname} = %{version}-%{release}
+Requires:	%{girname_glib} = %{version}-%{release}
+Requires:	%{girname_plugin} = %{version}-%{release}
 Requires:	%{qt2lib} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	packagekit-qt-devel < %{version}
@@ -137,6 +139,7 @@ Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	pango
 Requires:	%{name} = %{version}-%{release}
+Conflicts:	%{_lib}packagekit-glib14 < 0.7.4-2
 
 %description	gtk3-module
 The PackageKit GTK2+ module allows any Pango application to install
@@ -148,13 +151,15 @@ fonts from configured repositories using PackageKit.
 %patch4 -p0 -b .libexec~
 
 %build
-%configure2_5x	--disable-static \
-		--enable-gstreamer-plugin \
-		--enable-smart \
-		--enable-urpmi \
-		--enable-introspection \
-		--with-default-backend=urpmi \
-        --with-security-framework=polkit
+%configure2_5x	\
+	--disable-static \
+	--enable-gstreamer-plugin \
+	--enable-smart \
+	--enable-urpmi \
+	--enable-introspection \
+	--with-default-backend=urpmi \
+	--with-security-framework=polkit
+
 %make
 
 %install
@@ -194,15 +199,16 @@ fi
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
-%{_datadir}/PackageKit
-%{_datadir}/polkit-1/actions/*.policy
-%{_libdir}/pm-utils/sleep.d/95packagekit
+%{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/mime/packages/*.xml
+%{_sbindir}/pk-device-rebind
+%{_datadir}/PackageKit
+%{_datadir}/polkit-1/actions/*.policy
 %{python_sitelib}/packagekit
 %{_libexecdir}/packagekitd
-%{_sbindir}/pk-device-rebind
+%{_libexecdir}/pm-utils/sleep.d/95packagekit
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
 %{_libdir}/packagekit-backend/libpk_backend_smart.so
@@ -212,19 +218,15 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
+%{_libdir}/packagekit-plugins/*.so
 %{_mandir}/man1/*
 %dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 %dir %{_var}/cache/PackageKit
 %dir %{_var}/cache/PackageKit/downloads
-%{_libdir}/packagekit-plugins/*.so
-%{_datadir}/dbus-1/interfaces/*.xml
 
 %files -n %{libname}
 %{_libdir}/*packagekit-glib*.so.%{major}*
-%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
-%{_libdir}/gnome-settings-daemon-3.0/gtk-modules/*.desktop
-%{_datadir}/glib-2.0/schemas/*.gschema.xml
 
 %files -n %{girname_plugin}
 %{_libdir}/girepository-1.0/PackageKitPlugin-1.0.typelib
@@ -241,6 +243,7 @@ fi
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config-version.cmake
 %{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config.cmake
+%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 %{_datadir}/gir-1.0/PackageKitPlugin-1.0.gir
 
 %files cron
@@ -258,4 +261,7 @@ fi
 %{_libexecdir}/pk-command-not-found
 
 %files gtk3-module
+%{_libdir}/gnome-settings-daemon-3.0/gtk-modules/*.desktop
 %{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
+%{_datadir}/glib-2.0/schemas/*.gschema.xml
+
