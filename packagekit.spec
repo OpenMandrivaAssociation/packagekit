@@ -142,7 +142,7 @@ Requires:	%{name} = %{version}-%{release}
 Conflicts:	%{_lib}packagekit-glib14 < 0.7.4-2
 
 %description	gtk3-module
-The PackageKit GTK2+ module allows any Pango application to install
+The PackageKit GTK3+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
 %prep
