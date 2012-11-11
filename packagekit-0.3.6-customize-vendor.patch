@@ -1,0 +1,20 @@
+--- etc/Vendor.conf~	2008-10-05 19:35:08.000000000 +0200
++++ etc/Vendor.conf	2008-10-12 15:22:23.000000000 +0200
+@@ -12,7 +12,7 @@
+ # If the value is set to 'none' then no link is shown.
+ #
+ # default=http://www.packagekit.org/pk-package-not-found.html
+-DefaultUrl=http://www.packagekit.org/pk-package-not-found.html
++DefaultUrl=http://wiki.mandriva.com/en/Docs/Basic_tasks/Installing_and_removing_software#Making_more_applications_available
+ 
+ # The URL which is shown to the user when a codec could not be found.
+ # It should explain why certain codecs cannot be used, and perhaps show
+@@ -54,7 +54,7 @@
+ # The vendor name shown for the 'vendor' group
+ #
+ # default=My Vendor
+-VendorName=My Vendor
++VendorName=Mandriva
+ 
+ # The vendor icon name shown for the 'vendor' group
+ #
