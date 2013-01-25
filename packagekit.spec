@@ -13,7 +13,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
 Version:	0.7.6
-Release:	8
+Release:	9
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 URL:		http://www.packagekit.org
@@ -106,7 +106,7 @@ Crontab and utilities for running PackageKit as a cron job.
 %package	gstreamer-plugin
 Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
-Requires:	gstreamer0.10-tools
+Requires:	gstreamer-tools
 Requires:	%{name} = %{version}-%{release}
 Requires(post):	update-alternatives
 Requires(postun): update-alternatives
