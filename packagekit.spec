@@ -146,6 +146,17 @@ Conflicts:	%{_lib}packagekit-glib14 < 0.7.4-2
 The PackageKit GTK3+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
+%package        gtk2-module
+Summary:        Install fonts automatically using PackageKit
+Group:          System/Configuration/Packaging
+Requires:       pango
+Requires:       %{name} = %{version}-%{release}
+Conflicts:      %{_lib}packagekit-glib14 < 0.7.4-2
+
+%description    gtk2-module
+The PackageKit GTK+ module allows any Pango application to install
+fonts from configured repositories using PackageKit.
+
 %prep
 %setup -q -n PackageKit-%{version}
 %patch1 -p0
@@ -265,4 +276,7 @@ fi
 %{_libdir}/gnome-settings-daemon-3.0/gtk-modules/*.desktop
 %{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
 %{_datadir}/glib-2.0/schemas/*.gschema.xml
+
+%files gtk2-module
+%{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
 
