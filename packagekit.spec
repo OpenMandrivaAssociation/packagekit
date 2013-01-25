@@ -32,7 +32,7 @@ BuildRequires:	libgstreamer-plugins-base-devel
 BuildRequires:	polkit-1-devel >= 0.92
 BuildRequires:	pm-utils-devel
 BuildRequires:	qt4-devel
-BuildRequires:	sqlite3-devel
+BuildRequires:	sqlite-devel
 BuildRequires:	xulrunner-devel >= 1.9.1
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
