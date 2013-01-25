@@ -8,6 +8,7 @@
 %define	qt2major 1
 %define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
 %define	devname	%mklibname -d %{name}
+%define _disable_ld_no_undefined 1
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
