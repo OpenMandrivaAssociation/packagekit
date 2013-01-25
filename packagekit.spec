@@ -5,7 +5,7 @@
 %define girname_glib %mklibname packagekitglib-gir  %{girmajor}
 
 %define	libname %mklibname %{name}-glib %{major}
-%define	qt2major 1
+%define	qt2major 2
 %define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
 %define	devname	%mklibname -d %{name}
 %define _disable_ld_no_undefined 1
