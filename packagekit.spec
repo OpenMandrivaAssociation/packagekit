@@ -4,7 +4,8 @@
 %define girname_plugin %mklibname packagekitplugin-gir  %{girmajor}
 %define girname_glib %mklibname packagekitglib-gir  %{girmajor}
 
-%define	libname %mklibname %{name}-glib %{major}
+%define	libname %mklibname %{name}-glib2_ %{major}
+%define oldlibname %mklibname %{name}-glib %{major}
 %define	qt2major 2
 %define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
 %define	devname	%mklibname -d %{name}
@@ -53,6 +54,7 @@ PackageKit is a DBUS abstraction layer that allows the session user to manage
 packages in a secure way using a cross-distro, cross-architecture API.
 
 %package -n	%{libname}
+Obsoletes:      %{oldlibname}
 Summary:	Libraries for accessing PackageKit
 Group:		System/Configuration/Packaging
 
@@ -180,6 +182,9 @@ fonts from configured repositories using PackageKit.
 find %{buildroot} -name *.la | xargs rm
 
 %{find_lang} PackageKit
+
+chmod -x %{buildroot}/%{_sysconfdir}/cron.daily/*.cron
+chmod o+r %{buildroot}/%{_var}/lib/PackageKit/transactions.db
 
 %post
 # the job count used to live in /var/run, but it's now in /var/lib with the
