@@ -29,7 +29,7 @@ BuildRequires:	xsltproc
 BuildRequires:	cppunit-devel
 BuildRequires:	dbus-glib-devel
 BuildRequires:	libarchive-devel
-BuildRequires:	libgstreamer-plugins-base-devel
+BuildRequires:	gstreamer1.0-plugins-base-devel
 BuildRequires:	polkit-1-devel >= 0.92
 BuildRequires:	pm-utils-devel
 BuildRequires:	qt4-devel
