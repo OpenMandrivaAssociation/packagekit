@@ -19,6 +19,7 @@ URL:		http://www.packagekit.org
 Source0:	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
+Patch6:		enable.diff
 
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -54,7 +55,7 @@ PackageKit is a DBUS abstraction layer that allows the session user to manage
 packages in a secure way using a cross-distro, cross-architecture API.
 
 %package -n	%{libname}
-Obsoletes:      %{oldlibname}
+Obsoletes:	%{oldlibname}
 Summary:	Libraries for accessing PackageKit
 Group:		System/Configuration/Packaging
 
@@ -154,6 +155,7 @@ fonts from configured repositories using PackageKit.
 %setup -q -n PackageKit-%{version}
 %patch1 -p0
 %patch4 -p0 -b .libexec~
+%patch6 -p1 -b .enable~
 
 %build
 %configure2_5x	\
