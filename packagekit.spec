@@ -9,13 +9,14 @@
 %define _disable_ld_no_undefined 1
 
 Summary:	A DBUS packaging abstraction layer
-Name:	  	packagekit
+Name:		packagekit
 Version:	0.8.7
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 URL:		http://www.packagekit.org
-Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
+Source0:	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
+Source1:	%{name}.rpmlintrc
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
 
