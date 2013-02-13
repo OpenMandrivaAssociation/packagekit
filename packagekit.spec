@@ -4,7 +4,8 @@
 %define girname_plugin %mklibname packagekitplugin-gir %{girmajor}
 %define girname_glib %mklibname packagekitglib-gir %{girmajor}
 
-%define	libname %mklibname %{name}-glib %{major}
+%define	libname %mklibname %{name}-glib2_ %{major}
+%define oldlibname %mklibname %{name}-glib %{major}
 %define	devname	%mklibname -d %{name}
 %define _disable_ld_no_undefined 1
 
@@ -16,7 +17,6 @@ License:	GPLv2+
 Group:		System/Configuration/Packaging
 URL:		http://www.packagekit.org
 Source0:	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
-Source1:	%{name}.rpmlintrc
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
 
@@ -54,6 +54,7 @@ PackageKit is a DBUS abstraction layer that allows the session user to manage
 packages in a secure way using a cross-distro, cross-architecture API.
 
 %package -n	%{libname}
+Obsoletes:      %{oldlibname}
 Summary:	Libraries for accessing PackageKit
 Group:		System/Configuration/Packaging
 
@@ -182,6 +183,9 @@ find %{buildroot} -name *.la | xargs rm
 
 %{find_lang} PackageKit
 
+chmod -x %{buildroot}/%{_sysconfdir}/cron.daily/*.cron
+chmod o+r %{buildroot}/%{_var}/lib/PackageKit/transactions.db
+
 %post
 # the job count used to live in /var/run, but it's now in /var/lib with the
 # other persistent bits
@@ -278,4 +282,3 @@ fi
 
 %files gtk2-module
 %{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
-

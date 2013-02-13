@@ -1,4 +1,0 @@
-from Config import *
-from os import environ
-
-addFilter('lib.*packagekit-glib16\..*: incoherent-version-in-name .*2$')
