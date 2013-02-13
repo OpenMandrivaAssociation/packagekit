@@ -44,6 +44,7 @@ BuildRequires:	pkgconfig(pm-utils)
 BuildRequires:	pkgconfig(polkit-gobject-1) >= 0.98
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
+BuildRequires:	pkgconfig(xt)
 BuildRequires:	intltool
 BuildRequires:	gtk-doc
 
