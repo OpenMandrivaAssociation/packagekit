@@ -1,19 +1,17 @@
-%define	major	14
+%define	major	16
 
 %define girmajor 1.0
-%define girname_plugin %mklibname packagekitplugin-gir  %{girmajor}
-%define girname_glib %mklibname packagekitglib-gir  %{girmajor}
+%define girname_plugin %mklibname packagekitplugin-gir %{girmajor}
+%define girname_glib %mklibname packagekitglib-gir %{girmajor}
 
 %define	libname %mklibname %{name}-glib %{major}
-%define	qt2major 2
-%define	qt2lib	%mklibname %{name}-qt2_ %{qt2major}
 %define	devname	%mklibname -d %{name}
 %define _disable_ld_no_undefined 1
 
 Summary:	A DBUS packaging abstraction layer
 Name:	  	packagekit
-Version:	0.7.6
-Release:	9
+Version:	0.8.7
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 URL:		http://www.packagekit.org
@@ -21,26 +19,28 @@ Source0: 	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
 
-BuildRequires:	docbook-utils
-BuildRequires:	gtk-doc
-BuildRequires:	intltool
-BuildRequires:	xmlto
-BuildRequires:	xsltproc
-BuildRequires:	cppunit-devel
-BuildRequires:	dbus-glib-devel
-BuildRequires:	libarchive-devel
-BuildRequires:	libgstreamer-plugins-base-devel
-BuildRequires:	polkit-1-devel >= 0.92
-BuildRequires:	pm-utils-devel
-BuildRequires:	qt4-devel
-BuildRequires:	sqlite-devel
-BuildRequires:	xulrunner-devel >= 1.9.1
-BuildRequires:	pkgconfig(gtk+-2.0)
-BuildRequires:	pkgconfig(gtk+-3.0)
+BuildRequires:	pkgconfig(cairo)
+BuildRequires:	pkgconfig(fontconfig)
+BuildRequires:	pkgconfig(gio-2.0) >= 2.16.1
+BuildRequires:	pkgconfig(gio-unix-2.0)
+BuildRequires:	pkgconfig(gio-unix-2.0) >= 2.16.1
+BuildRequires:	pkgconfig(glib-2.0) >= 2.26.0
+BuildRequires:	pkgconfig(gmodule-2.0)
+BuildRequires:	pkgconfig(gobject-2.0)
+BuildRequires:	pkgconfig(gstreamer-0.10)
+BuildRequires:	pkgconfig(gstreamer-plugins-base-0.10)
+BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
+BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	pkgconfig(gobject-introspection-1.0)
-BuildRequires:	pkgconfig(python)
-#BuildRequires:	networkmanager-devel
+BuildRequires:	pkgconfig(libsystemd-login)
+BuildRequires:	pkgconfig(mozilla-plugin) >= 8.0
+BuildRequires:	pkgconfig(NetworkManager) >= 0.6.4
+BuildRequires:	pkgconfig(nspr) >= 4.8
+BuildRequires:	pkgconfig(pango)
+BuildRequires:	pkgconfig(pangoft2)
+BuildRequires:	pkgconfig(pm-utils)
+BuildRequires:	pkgconfig(polkit-gobject-1) >= 0.98
+BuildRequires:	pkgconfig(sqlite3)
 
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
@@ -59,27 +59,19 @@ Group:		System/Configuration/Packaging
 %description -n	%{libname}
 Libraries for accessing PackageKit.
 
-%package -n %{girname_plugin}
-Summary:    GObject Introspection interface library for %{name} plugin
-Group:      System/Libraries
+%package -n	%{girname_plugin}
+Summary:	GObject Introspection interface library for %{name} plugin
+Group:		System/Libraries
 
-%description -n %{girname_plugin}
+%description -n	%{girname_plugin}
 GObject Introspection interface library for %{name} plugin.
 
-%package -n %{girname_glib}
-Summary:    GObject Introspection interface library for %{name} glib
-Group:      System/Libraries
+%package -n	%{girname_glib}
+Summary:	GObject Introspection interface library for %{name} glib
+Group:		System/Libraries
 
-%description -n %{girname_glib}
+%description -n	%{girname_glib}
 GObject Introspection interface library for %{name} glib.
-
-%package -n	%{qt2lib}
-Summary:	QT libraries for accessing PackageKit
-Group:		System/Configuration/Packaging
-Requires:	%{name} = %{version}-%{release}
-
-%description -n	%{qt2lib}
-QT libraries for accessing PackageKit.
 
 %package -n	%{devname}
 Summary:	Libraries and headers for PackageKit
@@ -87,7 +79,6 @@ Group:		Development/Other
 Requires:	%{libname} = %{version}-%{release}
 Requires:	%{girname_glib} = %{version}-%{release}
 Requires:	%{girname_plugin} = %{version}-%{release}
-Requires:	%{qt2lib} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	packagekit-qt-devel < %{version}
 
@@ -109,7 +100,7 @@ Group:		System/Configuration/Packaging
 Requires:	gstreamer-tools
 Requires:	%{name} = %{version}-%{release}
 Requires(post):	update-alternatives
-Requires(postun): update-alternatives
+Requires(postun):update-alternatives
 Provides:	gst-install-plugins-helper
 
 %description	gstreamer-plugin
@@ -166,11 +157,20 @@ fonts from configured repositories using PackageKit.
 %configure2_5x	\
 	--disable-static \
 	--enable-gstreamer-plugin \
+	--disable-alpm \
+	--disable-apt \
+	--disable-box \
+	--disable-conary \
+	--enable-dummy \
+	--disable-opkg \
+	--disable-pisi \
+	--disable-poldek \
 	--enable-smart \
 	--enable-urpmi \
 	--enable-introspection \
-	--with-default-backend=urpmi \
-	--with-security-framework=polkit
+	--disable-yum \
+	--disable-zypp \
+	--with-default-backend=urpmi
 
 %make
 
@@ -210,6 +210,7 @@ fi
 %{_sysconfdir}/PackageKit/events/pre-transaction.d/README
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
+%{_unitdir}/packagekit-offline-update.service
 %{_bindir}/*
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
@@ -220,6 +221,9 @@ fi
 %{_datadir}/polkit-1/actions/*.policy
 %{python_sitelib}/packagekit
 %{_libexecdir}/packagekitd
+%{_libexecdir}/pk-clear-offline-update
+%{_libexecdir}/pk-offline-update
+%{_libexecdir}/pk-trigger-offline-update
 %{_libexecdir}/pm-utils/sleep.d/95packagekit
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
@@ -246,15 +250,10 @@ fi
 %files -n %{girname_glib}
 %{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
 
-%files -n %{qt2lib}
-%{_libdir}/libpackagekit-qt2.so.%{qt2major}*
-
 %files -n %{devname}
 %{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config-version.cmake
-%{_libdir}/cmake/packagekit-qt2/packagekit-qt2-config.cmake
 %{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
 %{_datadir}/gir-1.0/PackageKitPlugin-1.0.gir
 
@@ -275,7 +274,6 @@ fi
 %files gtk3-module
 %{_libdir}/gnome-settings-daemon-3.0/gtk-modules/*.desktop
 %{_libdir}/gtk-3.0/modules/libpk-gtk-module.so
-%{_datadir}/glib-2.0/schemas/*.gschema.xml
 
 %files gtk2-module
 %{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
