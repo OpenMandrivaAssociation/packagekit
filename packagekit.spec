@@ -43,6 +43,7 @@ BuildRequires:	pkgconfig(pangoft2)
 BuildRequires:	pkgconfig(pm-utils)
 BuildRequires:	pkgconfig(polkit-gobject-1) >= 0.98
 BuildRequires:	pkgconfig(sqlite3)
+BuildRequires:	pkgconfig(gobject-introspection-1.0)
 
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
