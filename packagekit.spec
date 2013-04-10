@@ -221,7 +221,6 @@ fi
 %{_sysconfdir}/PackageKit/events/pre-transaction.d/README
 %{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
-%{_unitdir}/packagekit-offline-update.service
 %{_bindir}/*
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
