@@ -1,36 +1,36 @@
-%define	major	16
-
-%define girmajor 1.0
-%define girname_plugin %mklibname packagekitplugin-gir %{girmajor}
-%define girname_glib %mklibname packagekitglib-gir %{girmajor}
-
-%define	libname %mklibname %{name}-glib2_ %{major}
-%define oldlibname %mklibname %{name}-glib %{major}
-%define	devname	%mklibname -d %{name}
 %define _disable_ld_no_undefined 1
+
+%define	major	16
+%define gimajor 1.0
+%define	libname %mklibname %{name}-glib2_ %{major}
+%define girplugin %mklibname packagekitplugin-gir %{gimajor}
+%define girname %mklibname packagekitglib-gir %{gimajor}
+%define	devname	%mklibname -d %{name}
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	0.8.7
+Version:	0.8.9
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
-URL:		http://www.packagekit.org
-Source0:	http://www.packagekit.org/releases/PackageKit-%version.tar.xz
+Url:		http://www.packagekit.org
+Source0:	http://www.packagekit.org/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
 Patch6:		enable.diff
 
+BuildRequires:	docbook-style-xsl
+BuildRequires:	gtk-doc
+BuildRequires:	intltool
+BuildRequires:	xsltproc
+BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
-BuildRequires:	pkgconfig(gio-2.0) >= 2.16.1
-BuildRequires:	pkgconfig(gio-unix-2.0)
-BuildRequires:	pkgconfig(gio-unix-2.0) >= 2.16.1
 BuildRequires:	pkgconfig(glib-2.0) >= 2.26.0
 BuildRequires:	pkgconfig(gmodule-2.0)
 BuildRequires:	pkgconfig(gobject-2.0)
-BuildRequires:	pkgconfig(gstreamer-0.10)
-BuildRequires:	pkgconfig(gstreamer-plugins-base-0.10)
+BuildRequires:	pkgconfig(gstreamer-1.0)
+BuildRequires:	pkgconfig(gstreamer-plugins-base-1.0)
 BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
 BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
@@ -45,8 +45,6 @@ BuildRequires:	pkgconfig(polkit-gobject-1) >= 0.98
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(xt)
-BuildRequires:	intltool
-BuildRequires:	gtk-doc
 
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
@@ -59,35 +57,34 @@ PackageKit is a DBUS abstraction layer that allows the session user to manage
 packages in a secure way using a cross-distro, cross-architecture API.
 
 %package -n	%{libname}
-Obsoletes:	%{oldlibname}
 Summary:	Libraries for accessing PackageKit
 Group:		System/Configuration/Packaging
+Obsoletes:	%{_lib}packagekit-glib16 < 0.8.7-1
 
 %description -n	%{libname}
 Libraries for accessing PackageKit.
 
-%package -n	%{girname_plugin}
+%package -n	%{girplugin}
 Summary:	GObject Introspection interface library for %{name} plugin
 Group:		System/Libraries
 
-%description -n	%{girname_plugin}
+%description -n	%{girplugin}
 GObject Introspection interface library for %{name} plugin.
 
-%package -n	%{girname_glib}
+%package -n	%{girname}
 Summary:	GObject Introspection interface library for %{name} glib
 Group:		System/Libraries
 
-%description -n	%{girname_glib}
+%description -n	%{girname}
 GObject Introspection interface library for %{name} glib.
 
 %package -n	%{devname}
 Summary:	Libraries and headers for PackageKit
 Group:		Development/Other
 Requires:	%{libname} = %{version}-%{release}
-Requires:	%{girname_glib} = %{version}-%{release}
-Requires:	%{girname_plugin} = %{version}-%{release}
+Requires:	%{girname} = %{version}-%{release}
+Requires:	%{girplugin} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
-Obsoletes:	packagekit-qt-devel < %{version}
 
 %description -n	%{devname}
 Headers and libraries for PackageKit.
@@ -106,8 +103,7 @@ Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	gstreamer-tools
 Requires:	%{name} = %{version}-%{release}
-Requires(post):	update-alternatives
-Requires(postun):update-alternatives
+Requires(post,postun):	update-alternatives
 Provides:	gst-install-plugins-helper
 
 %description	gstreamer-plugin
@@ -156,10 +152,8 @@ The PackageKit GTK+ module allows any Pango application to install
 fonts from configured repositories using PackageKit.
 
 %prep
-%setup -q -n PackageKit-%{version}
-%patch1 -p0
-%patch4 -p0 -b .libexec~
-%patch6 -p1 -b .enable~
+%setup -qn PackageKit-%{version}
+%apply_patches
 
 %build
 %configure2_5x	\
@@ -184,10 +178,8 @@ fonts from configured repositories using PackageKit.
 
 %install
 %makeinstall_std
-
+%find_lang PackageKit
 find %{buildroot} -name *.la | xargs rm
-
-%{find_lang} PackageKit
 
 chmod -x %{buildroot}/%{_sysconfdir}/cron.daily/*.cron
 chmod o+r %{buildroot}/%{_var}/lib/PackageKit/transactions.db
@@ -219,9 +211,9 @@ fi
 %{_sysconfdir}/PackageKit/events/post-transaction.d/README
 %dir %{_sysconfdir}/PackageKit/events/pre-transaction.d
 %{_sysconfdir}/PackageKit/events/pre-transaction.d/README
-%{_sysconfdir}/bash_completion.d/*
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
+%{_datadir}/bash-completion/completions/pkcon
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
@@ -252,20 +244,20 @@ fi
 %dir %{_var}/cache/PackageKit/downloads
 
 %files -n %{libname}
-%{_libdir}/*packagekit-glib*.so.%{major}*
+%{_libdir}/libpackagekit-glib2.so.%{major}*
 
-%files -n %{girname_plugin}
-%{_libdir}/girepository-1.0/PackageKitPlugin-1.0.typelib
+%files -n %{girplugin}
+%{_libdir}/girepository-1.0/PackageKitPlugin-%{gimajor}.typelib
 
-%files -n %{girname_glib}
-%{_libdir}/girepository-1.0/PackageKitGlib-1.0.typelib
+%files -n %{girname}
+%{_libdir}/girepository-1.0/PackageKitGlib-%{gimajor}.typelib
 
 %files -n %{devname}
 %{_includedir}/PackageKit
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
-%{_datadir}/gir-1.0/PackageKitGlib-1.0.gir
-%{_datadir}/gir-1.0/PackageKitPlugin-1.0.gir
+%{_datadir}/gir-1.0/PackageKitGlib-%{gimajor}.gir
+%{_datadir}/gir-1.0/PackageKitPlugin-%{gimajor}.gir
 
 %files cron
 %config %{_sysconfdir}/cron.daily/*.cron
@@ -287,3 +279,4 @@ fi
 
 %files gtk2-module
 %{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
+

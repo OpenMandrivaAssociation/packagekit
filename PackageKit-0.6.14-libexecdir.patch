@@ -1,5 +1,5 @@
---- contrib/command-not-found/PackageKit.sh.in.orig	2011-05-25 11:36:03.000000000 +0200
-+++ contrib/command-not-found/PackageKit.sh.in	2011-05-25 11:36:46.000000000 +0200
+--- ./contrib/command-not-found/PackageKit.sh.in.orig	2011-05-25 11:36:03.000000000 +0200
++++ ./contrib/command-not-found/PackageKit.sh.in	2011-05-25 11:36:46.000000000 +0200
 @@ -14,7 +14,7 @@
  	[ ! -S /var/run/dbus/system_bus_socket ] && runcnf=0
  
@@ -9,8 +9,8 @@
  
  	# run the command, or just print a warning
  	if [ $runcnf -eq 1 ]; then
---- contrib/command-not-found/PackageKit.sh.orig	2011-05-25 11:40:25.000000000 +0200
-+++ contrib/command-not-found/PackageKit.sh	2011-05-25 11:40:38.000000000 +0200
+--- ./contrib/command-not-found/PackageKit.sh.orig	2011-05-25 11:40:25.000000000 +0200
++++ ./contrib/command-not-found/PackageKit.sh	2011-05-25 11:40:38.000000000 +0200
 @@ -14,7 +14,7 @@
  	[ ! -S /var/run/dbus/system_bus_socket ] && runcnf=0
  
