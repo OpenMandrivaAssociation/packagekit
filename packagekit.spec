@@ -29,8 +29,8 @@ BuildRequires:	pkgconfig(fontconfig)
 BuildRequires:	pkgconfig(glib-2.0) >= 2.26.0
 BuildRequires:	pkgconfig(gmodule-2.0)
 BuildRequires:	pkgconfig(gobject-2.0)
-BuildRequires:	pkgconfig(gstreamer-1.0)
-BuildRequires:	pkgconfig(gstreamer-plugins-base-1.0)
+BuildRequires:	pkgconfig(gstreamer-0.10)
+BuildRequires:	pkgconfig(gstreamer-plugins-base-0.10)
 BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
 BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
@@ -174,7 +174,7 @@ fonts from configured repositories using PackageKit.
 	--disable-zypp \
 	--with-default-backend=urpmi
 
-%make
+make
 
 %install
 %makeinstall_std
