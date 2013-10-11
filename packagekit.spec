@@ -216,6 +216,7 @@ fi
 %{_datadir}/bash-completion/completions/pkcon
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
+%{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules 
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/mime/packages/*.xml
 %{_sbindir}/pk-device-rebind
