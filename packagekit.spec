@@ -10,13 +10,14 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	0.8.11
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.packagekit.org/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch4:		PackageKit-0.6.14-libexecdir.patch
+Patch5:		PackageKit-0.8.11-urpmi.patch
 Patch6:		enable.diff
 
 BuildRequires:	docbook-style-xsl
@@ -45,6 +46,7 @@ BuildRequires:	pkgconfig(polkit-gobject-1) >= 0.98
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(xt)
+BuildRequires:	pkgconfig(systemd)
 
 # fonts package in Mandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
@@ -217,6 +219,7 @@ fi
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules 
+%{_unitdir}/packagekit-offline-update.service
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/mime/packages/*.xml
 %{_sbindir}/pk-device-rebind
