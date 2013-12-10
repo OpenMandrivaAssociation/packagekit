@@ -1,0 +1,26 @@
+From cb38c672b92c85923826612520076cbb5d204ad7 Mon Sep 17 00:00:00 2001
+From: Wolfgang Rosenauer <wr@rosenauer.org>
+Date: Tue, 25 Oct 2011 14:27:15 +0200
+Subject: [PATCH 2/9] Build against npapi-sdk instead of xulrunner
+
+https://bugs.freedesktop.org/show_bug.cgi?id=40026
+---
+ configure.ac |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 3c52f68..026f635 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -333,7 +333,7 @@ AC_ARG_ENABLE(browser_plugin, AS_HELP_STRING([--enable-browser-plugin],[Build br
+ 	      enable_browser_plugin=$enableval,enable_browser_plugin=yes)
+ if test x$enable_browser_plugin = xyes; then
+ 	PKG_CHECK_MODULES(PK_BROWSER_PLUGIN,	\
+-			  mozilla-plugin >= 8.0	\
++			  npapi-sdk		\
+ 			  gio-unix-2.0		\
+ 			  nspr >= 4.8		\
+ 			  cairo			\
+-- 
+1.7.10.4
+

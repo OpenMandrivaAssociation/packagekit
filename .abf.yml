@@ -1,2 +1,4 @@
-sources:
+removed_sources:
   PackageKit-0.8.11.tar.xz: 1ba805675a40e790ec0124b8393a15280d881170
+sources:
+  PackageKit-0.8.12.tar.xz: 7727ed338f50eff92e0a4711e9f0f70c020471ea

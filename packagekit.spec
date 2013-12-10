@@ -9,16 +9,16 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	0.8.11
-Release:	6
+Version:	0.8.12
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.packagekit.org/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch4:		PackageKit-0.6.14-libexecdir.patch
 Patch5:		PackageKit-0.8.11-urpmi.patch
 Patch6:		enable.diff
+Patch7:		0002-Build-against-npapi-sdk-instead-of-xulrunner.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
@@ -36,7 +36,7 @@ BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
 BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
 BuildRequires:	pkgconfig(libsystemd-login)
-BuildRequires:	pkgconfig(mozilla-plugin) >= 8.0
+BuildRequires:	pkgconfig(npapi-sdk)
 BuildRequires:	pkgconfig(NetworkManager) >= 0.6.4
 BuildRequires:	pkgconfig(nspr) >= 4.8
 BuildRequires:	pkgconfig(pango)
