@@ -241,6 +241,7 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_libdir}/packagekit-plugins/*.so
+%{_libdir}/pm-utils/sleep.d/95packagekit
 %{_mandir}/man1/*
 %dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
