@@ -1,11 +1,11 @@
 %define _disable_ld_no_undefined 1
 
-%define	major	16
+%define	major 16
 %define gimajor 1.0
 %define	libname %mklibname %{name}-glib2_ %{major}
 %define girplugin %mklibname packagekitplugin-gir %{gimajor}
 %define girname %mklibname packagekitglib-gir %{gimajor}
-%define	devname	%mklibname -d %{name}
+%define	devname %mklibname -d %{name}
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
@@ -230,7 +230,7 @@ fi
 %{_libexecdir}/pk-clear-offline-update
 %{_libexecdir}/pk-offline-update
 %{_libexecdir}/pk-trigger-offline-update
-%{_libexecdir}/pm-utils/sleep.d/95packagekit
+%{_libdir}/pm-utils/sleep.d/95packagekit
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
 %{_libdir}/packagekit-backend/libpk_backend_smart.so
@@ -241,7 +241,6 @@ fi
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_libdir}/packagekit-plugins/*.so
-%{_libdir}/pm-utils/sleep.d/95packagekit
 %{_mandir}/man1/*
 %dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
