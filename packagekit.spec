@@ -9,8 +9,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	0.8.12
-Release:	3
+Version:	0.9.4
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -48,7 +48,7 @@ BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(xt)
 BuildRequires:	pkgconfig(systemd)
 
-# fonts package in Mandriva do not have needed provides yet to be useful
+# fonts package in OpenMandriva do not have needed provides yet to be useful
 Suggests:	%{name}-gtk3-module = %{version}
 Suggests:	packagekit-gui
 # No gtk2 plugin anymore
@@ -158,7 +158,7 @@ fonts from configured repositories using PackageKit.
 %apply_patches
 
 %build
-%configure2_5x	\
+%configure \
 	--disable-static \
 	--enable-gstreamer-plugin \
 	--disable-alpm \
@@ -169,7 +169,7 @@ fonts from configured repositories using PackageKit.
 	--disable-opkg \
 	--disable-pisi \
 	--disable-poldek \
-	--enable-smart \
+	--disable-smart \
 	--enable-urpmi \
 	--enable-introspection \
 	--disable-yum \
