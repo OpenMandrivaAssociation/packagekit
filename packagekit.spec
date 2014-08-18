@@ -1,6 +1,6 @@
 %define _disable_ld_no_undefined 1
 
-%define	major 16
+%define	major 18
 %define gimajor 1.0
 %define	libname %mklibname %{name}-glib2_ %{major}
 %define girplugin %mklibname packagekitplugin-gir %{gimajor}
@@ -30,8 +30,9 @@ BuildRequires:	pkgconfig(fontconfig)
 BuildRequires:	pkgconfig(glib-2.0) >= 2.26.0
 BuildRequires:	pkgconfig(gmodule-2.0)
 BuildRequires:	pkgconfig(gobject-2.0)
-BuildRequires:	pkgconfig(gstreamer-0.10)
-BuildRequires:	pkgconfig(gstreamer-plugins-base-0.10)
+BuildRequires:	pkgconfig(gstreamer-1.0)
+BuildRequires:	pkgconfig(gstreamer-base-1.0)
+BuildRequires:	pkgconfig(gstreamer-plugins-base-1.0)
 BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
 BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
@@ -103,7 +104,7 @@ Crontab and utilities for running PackageKit as a cron job.
 %package	gstreamer-plugin
 Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
-Requires:	gstreamer-tools
+Requires:	gstreamer1.0-tools
 Requires:	%{name} = %{version}-%{release}
 Requires(post,postun):	update-alternatives
 Provides:	gst-install-plugins-helper
