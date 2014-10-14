@@ -3,13 +3,12 @@
 %define	major 18
 %define gimajor 1.0
 %define	libname %mklibname %{name}-glib2_ %{major}
-%define girplugin %mklibname packagekitplugin-gir %{gimajor}
 %define girname %mklibname packagekitglib-gir %{gimajor}
 %define	devname %mklibname -d %{name}
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	0.9.4
+Version:	1.0.0
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -18,7 +17,6 @@ Source0:	http://www.packagekit.org/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch5:		PackageKit-0.8.11-urpmi.patch
 Patch6:		enable.diff
-Patch7:		0002-Build-against-npapi-sdk-instead-of-xulrunner.patch
 
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
@@ -37,6 +35,7 @@ BuildRequires:	pkgconfig(gtk+-2.0) >= 2.14.0
 BuildRequires:	pkgconfig(gtk+-3.0) >= 3.0.0
 BuildRequires:	pkgconfig(gudev-1.0)
 BuildRequires:	pkgconfig(libsystemd-login)
+BuildRequires:	pkgconfig(libsystemd-journal)
 BuildRequires:	pkgconfig(npapi-sdk)
 BuildRequires:	pkgconfig(NetworkManager) >= 0.6.4
 BuildRequires:	pkgconfig(nspr) >= 4.8
@@ -67,13 +66,6 @@ Obsoletes:	%{_lib}packagekit-glib16 < 0.8.7-1
 %description -n	%{libname}
 Libraries for accessing PackageKit.
 
-%package -n	%{girplugin}
-Summary:	GObject Introspection interface library for %{name} plugin
-Group:		System/Libraries
-
-%description -n	%{girplugin}
-GObject Introspection interface library for %{name} plugin.
-
 %package -n	%{girname}
 Summary:	GObject Introspection interface library for %{name} glib
 Group:		System/Libraries
@@ -86,7 +78,6 @@ Summary:	Libraries and headers for PackageKit
 Group:		Development/Other
 Requires:	%{libname} = %{version}-%{release}
 Requires:	%{girname} = %{version}-%{release}
-Requires:	%{girplugin} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 
 %description -n	%{devname}
@@ -209,39 +200,29 @@ fi
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/CommandNotFound.conf
-%dir %{_sysconfdir}/PackageKit/events
-%dir %{_sysconfdir}/PackageKit/events/post-transaction.d
-%{_sysconfdir}/PackageKit/events/post-transaction.d/README
-%dir %{_sysconfdir}/PackageKit/events/pre-transaction.d
-%{_sysconfdir}/PackageKit/events/pre-transaction.d/README
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
 %{_datadir}/bash-completion/completions/pkcon
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules 
+%{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
 %{_datadir}/gtk-doc/html/PackageKit
-%{_datadir}/mime/packages/*.xml
-%{_sbindir}/pk-device-rebind
 %{_datadir}/PackageKit
 %{_datadir}/polkit-1/actions/*.policy
 %{python_sitelib}/packagekit
 %{_libexecdir}/packagekitd
-%{_libexecdir}/pk-clear-offline-update
+%{_libexecdir}/packagekit-direct
 %{_libexecdir}/pk-offline-update
-%{_libexecdir}/pk-trigger-offline-update
-%{_libdir}/pm-utils/sleep.d/95packagekit
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
-%{_libdir}/packagekit-backend/libpk_backend_smart.so
 %{_libdir}/packagekit-backend/libpk_backend_test_fail.so
 %{_libdir}/packagekit-backend/libpk_backend_test_nop.so
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
-%{_libdir}/packagekit-plugins/*.so
 %{_mandir}/man1/*
 %dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
@@ -251,9 +232,6 @@ fi
 %files -n %{libname}
 %{_libdir}/libpackagekit-glib2.so.%{major}*
 
-%files -n %{girplugin}
-%{_libdir}/girepository-1.0/PackageKitPlugin-%{gimajor}.typelib
-
 %files -n %{girname}
 %{_libdir}/girepository-1.0/PackageKitGlib-%{gimajor}.typelib
 
@@ -262,7 +240,6 @@ fi
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/gir-1.0/PackageKitGlib-%{gimajor}.gir
-%{_datadir}/gir-1.0/PackageKitPlugin-%{gimajor}.gir
 
 %files cron
 %config %{_sysconfdir}/cron.daily/*.cron

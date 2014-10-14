@@ -9,12 +9,3 @@
  
  # The URL which is shown to the user when a codec could not be found.
  # It should explain why certain codecs cannot be used, and perhaps show
-@@ -54,7 +54,7 @@
- # The vendor name shown for the 'vendor' group
- #
- # default=My Vendor
--VendorName=My Vendor
-+VendorName=OpenMandriva
- 
- # The vendor icon name shown for the 'vendor' group
- #

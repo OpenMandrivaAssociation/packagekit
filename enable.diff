@@ -12,6 +12,6 @@ index 08e9fb9..040bb7a 100644
 -	g_error ("Backend needs to be ported to 0.8.x -- "
 -		 "see backends/PORTING.txt for details");
 -
- 	spawn = pk_backend_spawn_new ();
+ 	spawn = pk_backend_spawn_new (conf);
  	pk_backend_spawn_set_name (spawn, "urpmi");
  }
