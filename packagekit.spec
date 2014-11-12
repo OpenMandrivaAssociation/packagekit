@@ -8,12 +8,12 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.0.0
+Version:	1.0.3
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
-Source0:	http://www.packagekit.org/releases/PackageKit-%{version}.tar.xz
+Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
 Patch5:		PackageKit-0.8.11-urpmi.patch
 Patch6:		enable.diff
@@ -208,10 +208,10 @@ fi
 %{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules 
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
+/lib/systemd/system/system-update.target.wants
 %{_datadir}/gtk-doc/html/PackageKit
 %{_datadir}/PackageKit
 %{_datadir}/polkit-1/actions/*.policy
-%{python_sitelib}/packagekit
 %{_libexecdir}/packagekitd
 %{_libexecdir}/packagekit-direct
 %{_libexecdir}/pk-offline-update
