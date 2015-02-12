@@ -1,3 +1,4 @@
+%global ldflags %ldflags -Wl,--as-needed
 
 %define gstapi 1.0
 
