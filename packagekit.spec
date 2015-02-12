@@ -17,8 +17,7 @@ Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch5:		PackageKit-0.8.11-urpmi.patch
-Patch6:		enable.diff
+Patch5:		PackageKit-1.0.5-OpenMandriva-support.patch
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
 BuildRequires:	intltool
@@ -267,9 +266,12 @@ fonts from configured repositories using PackageKit.
 	--enable-introspection \
 	--disable-yum \
 	--disable-zypp \
-	--with-default-backend=urpmi
+	--with-default-backend=urpmi \
+	--with-systemdsystemunitdir=%{_unitdir} \
+	--enable-systemd \
+	--enable-python3
 
-make
+%make
 
 %install
 %makeinstall_std
