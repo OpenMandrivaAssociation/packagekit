@@ -1,0 +1,78 @@
+diff -Naur PackageKit-1.0.5/backends/urpmi/helpers/urpmi-dispatched-backend.pl PackageKit-1.0.5.tpg/backends/urpmi/helpers/urpmi-dispatched-backend.pl
+--- PackageKit-1.0.5/backends/urpmi/helpers/urpmi-dispatched-backend.pl	2014-11-20 09:07:41.000000000 +0000
++++ PackageKit-1.0.5.tpg/backends/urpmi/helpers/urpmi-dispatched-backend.pl	2015-02-12 21:22:09.988829819 +0000
+@@ -43,7 +43,7 @@
+ dispatch_command($urpm, \@ARGV);
+ print "finished\n";
+ 
+-foreach (<STDIN>) {
++while (<STDIN>) {
+   chomp($_);
+   my @args = split(/\t/, $_);
+   dispatch_command($urpm, \@args);
+@@ -206,7 +206,7 @@
+ 
+   my $newer_version = _get_newer_distrib($distrib->{version}, \@distribs);
+   $newer_version or goto finished;
+-  pk_print_distro_upgrade(PK_DISTRO_UPGRADE_ENUM_STABLE, join(" ", "Mageia", $product_id{product}, $newer_version->{version}), "");
++  pk_print_distro_upgrade(PK_DISTRO_UPGRADE_ENUM_STABLE, join(" ", "OpenMandriva", $product_id{product}, $newer_version->{version}), "");
+ 
+   unlink($distribfile_path);
+   finished:
+@@ -799,9 +799,9 @@
+   pk_print_update_detail(get_package_id($pkg),
+     join("&", @to_upgrade_pkids),
+     join("&", map { fullname_to_package_id($_) } @to_remove),
+-    "http://bugs.mageia.org",
+-    "http://bugs.mageia.org",
+-    "http://bugs.mageia.org",
++    "http://isuess.openmandriva.org",
++    "http://issues.openmandriva.org",
++    "http://issues.openmandriva.org",
+     $restart ? PK_RESTART_ENUM_SYSTEM : PK_RESTART_ENUM_NONE,
+     $desc);
+ }
+@@ -824,7 +824,7 @@
+   
+   -x "/usr/bin/wget" or die "wget is missing\n";
+   
+-  my $api_url = sprintf("http://mirrors.mageia.org/api/mageia.%s.%s.list",
++  my $api_url = sprintf("http://downloads.openmandriva.org/mirrors/openmandriva.%s.%s.list",
+                   lc($product_id->{release}),
+                   lc($product_id->{arch}));
+   
+diff -Naur PackageKit-1.0.5/backends/urpmi/helpers/urpmi_backend/tools.pm PackageKit-1.0.5.tpg/backends/urpmi/helpers/urpmi_backend/tools.pm
+--- PackageKit-1.0.5/backends/urpmi/helpers/urpmi_backend/tools.pm	2014-09-09 16:45:15.000000000 +0000
++++ PackageKit-1.0.5.tpg/backends/urpmi/helpers/urpmi_backend/tools.pm	2015-02-12 21:25:51.283917699 +0000
+@@ -26,6 +26,7 @@
+   urpm_name 
+   find_installed_fullname 
+   is_mageia
++  is_omv
+   is_package_installed
+   get_package_id 
+   ensure_utf8 
+@@ -87,15 +88,20 @@
+ 
+ sub is_package_installed {
+     my ($pkg) = @_;
+-    return URPM::DB::open()->is_package_installed($pkg);
++    return URPM::is_package_installed(URPM::DB::open(),$pkg);
+ }
+ 
+ sub is_mageia() {
+-    cat_('/etc/release') =~ /Mageia/;
++    cat_('/etc/release') =~ /OpenMandriva/;
++}
++
++sub is_omv() {
++    cat_('/etc/release') =~ /OpenMandriva/;
+ }
+ 
+ sub vendor() {
+-    is_mageia() ? "mageia" : "mandriva";
++    is_mageia() ? "openmandriva" : "mandriva";
++    is_omv() ? "openmandriva" : "mandriva";
+ }
+ 
+ sub get_package_id {
