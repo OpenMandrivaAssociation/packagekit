@@ -1,4 +1,5 @@
 %define _disable_ld_no_undefined 1
+%define _disable_rebuild_configure 1
 %define gstapi 1.0
 
 %define major 18
