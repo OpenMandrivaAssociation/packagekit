@@ -9,8 +9,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.0.6
-Release:	2
+Version:	1.0.8
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -252,6 +252,8 @@ fonts from configured repositories using PackageKit.
 %configure \
 	--disable-static \
 	--enable-gstreamer-plugin \
+	--enable-browser-plugin \
+	--enable-cron \
 	--disable-alpm \
 	--disable-apt \
 	--disable-box \
@@ -265,8 +267,11 @@ fonts from configured repositories using PackageKit.
 	--enable-introspection \
 	--disable-yum \
 	--disable-zypp \
-	--with-default-backend=urpmi \
 	--with-systemdsystemunitdir=%{_unitdir} \
+	--with-mozilla-plugin-dir="%{_libdir}/mozilla/plugins" \
+	--enable-bash-completion \
+	--enable-local \
+	--enable-command-not-found \
 	--enable-systemd \
 	--enable-python3
 
