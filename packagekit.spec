@@ -17,8 +17,6 @@ Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch1:		packagekit-0.3.6-customize-vendor.patch
-# (tpg) from Fedora
-Patch2:		0001-Correctly-register-enum-properties.patch
 Patch5:		PackageKit-1.0.5-OpenMandriva-support.patch
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
