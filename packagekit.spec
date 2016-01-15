@@ -11,13 +11,15 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.0.11
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
-Patch1:		packagekit-0.3.6-customize-vendor.patch
-Patch5:		PackageKit-1.0.5-OpenMandriva-support.patch
+Patch0:		packagekit-0.3.6-customize-vendor.patch
+Patch1:		PackageKit-1.0.5-OpenMandriva-support.patch
+# (tpg) try some ugly workaround for https://issues.openmandriva.org/show_bug.cgi?id=1381
+Patch2:		PackageKit-1.0.11-urpmi-dispatcher-remove-loop.patch
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
 BuildRequires:	intltool
