@@ -5,7 +5,7 @@
  #
  # default=http://www.packagekit.org/pk-package-not-found.html
 -DefaultUrl=http://www.packagekit.org/pk-package-not-found.html
-+DefaultUrl=https://wwww.openmandriva.org/
++DefaultUrl=https://www.openmandriva.org/
  
  # The URL which is shown to the user when a codec could not be found.
  # It should explain why certain codecs cannot be used, and perhaps show
