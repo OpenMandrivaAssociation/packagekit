@@ -49,6 +49,8 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	pkgconfig(xt)
+Obsoletes:	%{name}-browser-plugin < 1.1.0-1
+Provides:	%{name}-browser-plugin = 1.1.0-1
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -92,7 +94,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 # the job count used to live in /var/run, but it's now in /var/lib with the
 # other persistent bits
 if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
-	mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
+    mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
 fi
 
 #----------------------------------------------------------------------------
@@ -182,21 +184,6 @@ fi
 
 #----------------------------------------------------------------------------
 
-%package browser-plugin
-Summary:	Browser Plugin for PackageKit
-Group:		System/Configuration/Packaging
-Requires:	%{name} = %{EVRD}
-
-%description browser-plugin
-The PackageKit browser plugin allows web sites to offer the ability to
-users to install and update packages from configured repositories
-using PackageKit.
-
-%files browser-plugin
-%{_libdir}/mozilla/plugins/packagekit-plugin.*
-
-#----------------------------------------------------------------------------
-
 %package command-not-found
 Summary:	Ask the user to install command line programs automatically
 Group:		System/Configuration/Packaging
@@ -251,7 +238,6 @@ fonts from configured repositories using PackageKit.
 %configure \
 	--disable-static \
 	--enable-gstreamer-plugin \
-	--enable-browser-plugin \
 	--enable-cron \
 	--disable-alpm \
 	--disable-apt \
