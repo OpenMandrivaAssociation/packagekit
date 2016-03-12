@@ -1,0 +1,39 @@
+diff -urw a/backends/urpmi/helpers/perl_packagekit/prints.pm urpmi/perl_packagekit/prints.pm
+--- a/backends/urpmi/helpers/perl_packagekit/prints.pm	2015-12-10 16:54:37.000000000 +0000
++++ b/backends/urpmi/helpers/perl_packagekit/prints.pm	2016-03-12 01:13:48.533825034 +0000
+@@ -53,8 +53,8 @@
+   # @param desc: The multi line package description
+   # @param url: The upstream project homepage
+   # @param bytes: The size of the package, in bytes
+-  my ($id, $license, $group, $desc, $url, $bytes) = @_;
+-  printf("details\t%s\t%s\t%s\t%s\t%s\t%ld\n", $id, $license, $group, $desc, $url, $bytes);
++  my ($id, $summary, $license, $group, $desc, $url, $bytes) = @_;
++  printf("details\t%s\t%s\t%s\t%s\t%s\t%s\t%ld\n", $id, $summary, $license, $group, $desc, $url, $bytes);
+ }
+ 
+ sub pk_print_files {
+diff -urw a/backends/urpmi/helpers/urpmi-dispatched-backend.pl urpmi/urpmi-dispatched-backend.pl
+--- a/backends/urpmi/helpers/urpmi-dispatched-backend.pl	2016-03-11 23:01:26.000000000 +0000
++++ b/backends/urpmi/helpers/urpmi-dispatched-backend.pl	2016-03-12 01:19:18.516171106 +0000
+@@ -744,7 +744,7 @@
+   my $xml_info_file = urpm::media::any_xml_info($urpm, $medium, $xml_info, undef, undef);
+   
+   if (!$xml_info_file) {
+-    pk_print_details(get_package_id($pkg), "N/A", $pkg->group, "N/A", "N/A", 0);
++    pk_print_details(get_package_id($pkg), "N/A", "N/A", $pkg->group, "N/A", "N/A", 0);
+     return;
+   }
+   
+@@ -757,8 +757,10 @@
+   my $description = $xml_info_pkgs{$name}{description};
+   $description =~ s/\n/;/g;
+   $description =~ s/\t/ /g;
+-  
+-  pk_print_details(get_package_id($pkg), "N/A", get_pk_group($pkg->group), ensure_utf8($description), $xml_info_pkgs{$name}{url}, $pkg->size);
++  my $size = $pkg->size;
++  my $url = $xml_info_pkgs{$name}{url};
++  $description = ensure_utf8($description);
++ pk_print_details(get_package_id($pkg), $pkg->summary, "N/A", get_pk_group($pkg->group), $description, $url, $size);
+ }
+ 
+ sub _print_package_files {

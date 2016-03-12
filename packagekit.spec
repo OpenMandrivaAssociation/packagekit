@@ -11,15 +11,17 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.0
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 Patch1:		PackageKit-1.0.5-OpenMandriva-support.patch
-# (tpg) try some ugly workaround for https://issues.openmandriva.org/show_bug.cgi?id=1381
-Patch2:		PackageKit-1.0.11-urpmi-dispatcher-remove-loop.patch
+# fix dispatcher hanging due to incorrect syntax
+Patch2:		PackageKit-1.1.0-urpmi-dispatcher_fix.patch
+# add missing summary and fix size reported as 0
+Patch3:		PackageKit-1.1.0-urpmi_fixes.patch
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
 BuildRequires:	intltool
@@ -252,6 +254,7 @@ fonts from configured repositories using PackageKit.
 	--enable-introspection \
 	--disable-yum \
 	--disable-zypp \
+	--disable-vala \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--with-mozilla-plugin-dir="%{_libdir}/mozilla/plugins" \
 	--enable-bash-completion \
