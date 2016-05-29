@@ -11,7 +11,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.1
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -39,8 +39,7 @@ BuildRequires:	pkgconfig(gstreamer-plugins-base-%{gstapi})
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
 BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	pkgconfig(libsystemd-login)
-BuildRequires:	pkgconfig(libsystemd-journal)
+BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(npapi-sdk)
 BuildRequires:	pkgconfig(NetworkManager)
 BuildRequires:	pkgconfig(nspr)
