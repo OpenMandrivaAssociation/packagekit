@@ -11,7 +11,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.1
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -51,6 +51,7 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	pkgconfig(xt)
+BuildRequires:	pkgconfig(libhif)
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
 
@@ -82,6 +83,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
+%{_libdir}/packagekit-backend/libpk_backend_hif.so
 %{_libdir}/packagekit-backend/libpk_backend_urpmi.so
 %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
@@ -246,6 +248,7 @@ fonts from configured repositories using PackageKit.
 	--disable-box \
 	--disable-conary \
 	--enable-dummy \
+	--enable-hif \
 	--disable-opkg \
 	--disable-pisi \
 	--disable-poldek \
