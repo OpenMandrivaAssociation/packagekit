@@ -26,6 +26,7 @@ BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
 BuildRequires:	intltool
 BuildRequires:	xsltproc
+BuildRequires:	pkgconfig(appstream-glib)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -39,6 +40,7 @@ BuildRequires:	pkgconfig(gstreamer-plugins-base-%{gstapi})
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
 BuildRequires:	pkgconfig(gudev-1.0)
+BuildRequires:	pkgconfig(libhif)
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(npapi-sdk)
 BuildRequires:	pkgconfig(NetworkManager)
@@ -50,7 +52,7 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	pkgconfig(xt)
-BuildRequires:	pkgconfig(libhif)
+
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
 
