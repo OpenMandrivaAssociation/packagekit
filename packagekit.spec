@@ -247,7 +247,7 @@ fonts from configured repositories using PackageKit.
 
 # (tpg) ugly workaround !
 # we have polkit 0.113 patched with few cherry-picks form upstream
-# so it is safe to call that 0.113 a 0.114 here
+# so it is safe to call that 0.113 is a 0.114 here
 sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 
 
@@ -267,7 +267,7 @@ sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 	--disable-aptcc \
 	--disable-entropy \
 	--enable-dummy \
-	--enable-hif \
+	--disable-dnf \
 	--disable-pisi \
 	--disable-poldek \
 	--disable-portage \
@@ -277,8 +277,7 @@ sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 	--disable-yum \
 	--disable-zypp \
 	--disable-nix \
-	--with-systemdsystemunitdir=%{_unitdir} \
-	--with-mozilla-plugin-dir="%{_libdir}/mozilla/plugins" \
+	--with-systemdsystemunitdir=%{_systemunitdir} \
 	--enable-python3
 
 %make
@@ -289,4 +288,3 @@ sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 
 chmod -x %{buildroot}%{_sysconfdir}/cron.daily/*.cron
 chmod o+r %{buildroot}%{_var}/lib/PackageKit/transactions.db
-
