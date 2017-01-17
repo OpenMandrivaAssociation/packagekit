@@ -250,34 +250,35 @@ fonts from configured repositories using PackageKit.
 # so it is safe to call that 0.113 a 0.114 here
 sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 
-./autogen.sh
 
 %build
 %configure \
 	--disable-static \
+	--enable-vala=no \
+	--enable-systemd \
+	--enable-offline-update \
+	--enable-bash-completion \
+	--enable-local \
 	--enable-gstreamer-plugin \
+	--enable-command-not-found \
+	--enable-urpmi \
 	--enable-cron \
 	--disable-alpm \
-	--disable-apt \
-	--disable-box \
-	--disable-conary \
+	--disable-aptcc \
+	--disable-entropy \
 	--enable-dummy \
 	--enable-hif \
-	--disable-opkg \
 	--disable-pisi \
 	--disable-poldek \
-	--disable-smart \
-	--enable-urpmi \
+	--disable-portage \
+	--disable-ports \
+	--disable-katja \
 	--enable-introspection \
 	--disable-yum \
 	--disable-zypp \
-	--disable-vala \
+	--disable-nix \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--with-mozilla-plugin-dir="%{_libdir}/mozilla/plugins" \
-	--enable-bash-completion \
-	--enable-local \
-	--enable-command-not-found \
-	--enable-systemd \
 	--enable-python3
 
 %make
