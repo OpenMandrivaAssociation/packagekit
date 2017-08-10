@@ -56,6 +56,7 @@ BuildRequires:	pkgconfig(pango)
 BuildRequires:	pkgconfig(pangoft2)
 BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
+BuildRequires:	pkgconfig(vapigen)
 BuildRequires:	pkgconfig(xt)
 
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
