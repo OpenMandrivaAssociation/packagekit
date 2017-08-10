@@ -1,20 +1,20 @@
-From c0faf05bc1b8de6dfbf38c55ceb4edc9c9d198b0 Mon Sep 17 00:00:00 2001
+From 1c98c8b0c873afb65a29c462d98ecee7b065ae29 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Tomasz=20Pawe=C5=82=20Gajc?= <tpgxyz@gmail.com>
 Date: Tue, 1 Nov 2016 22:30:13 +0100
 Subject: [PATCH 1003/1003] hif: Add OpenMandriva vendor
 
 ---
- backends/hif/hif-backend-vendor-openmandriva.c | 65 ++++++++++++++++++++++++++
+ backends/hif/hif-backend-vendor-openmandriva.c | 66 ++++++++++++++++++++++++++
  configure.ac                                   |  4 +-
- 2 files changed, 67 insertions(+), 2 deletions(-)
+ 2 files changed, 68 insertions(+), 2 deletions(-)
  create mode 100644 backends/hif/hif-backend-vendor-openmandriva.c
 
 diff --git a/backends/hif/hif-backend-vendor-openmandriva.c b/backends/hif/hif-backend-vendor-openmandriva.c
 new file mode 100644
-index 000000000..fee10c4b9
+index 000000000..c67465a20
 --- /dev/null
 +++ b/backends/hif/hif-backend-vendor-openmandriva.c
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,66 @@
 +/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2016 Tomasz Paweł Gajc <tpgxyz@gmail.com>
@@ -49,8 +49,9 @@ index 000000000..fee10c4b9
 +					  "-non-free",
 +					  NULL };
 +
-+	/* OpenMandriva doesn't provide either "-debuginfo" nor "-source" repositories */
 +	const gchar *valid_sourcetype[] = { "",
++					  "-debuginfo",
++					  "-source",
 +					  NULL };
 +
 +	const gchar *valid_arch[] = { "x86_64",
