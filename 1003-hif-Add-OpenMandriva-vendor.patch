@@ -1,0 +1,100 @@
+From c0faf05bc1b8de6dfbf38c55ceb4edc9c9d198b0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Tomasz=20Pawe=C5=82=20Gajc?= <tpgxyz@gmail.com>
+Date: Tue, 1 Nov 2016 22:30:13 +0100
+Subject: [PATCH 1003/1003] hif: Add OpenMandriva vendor
+
+---
+ backends/hif/hif-backend-vendor-openmandriva.c | 65 ++++++++++++++++++++++++++
+ configure.ac                                   |  4 +-
+ 2 files changed, 67 insertions(+), 2 deletions(-)
+ create mode 100644 backends/hif/hif-backend-vendor-openmandriva.c
+
+diff --git a/backends/hif/hif-backend-vendor-openmandriva.c b/backends/hif/hif-backend-vendor-openmandriva.c
+new file mode 100644
+index 000000000..fee10c4b9
+--- /dev/null
++++ b/backends/hif/hif-backend-vendor-openmandriva.c
+@@ -0,0 +1,65 @@
++/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
++ *
++ * Copyright (C) 2016 Tomasz Paweł Gajc <tpgxyz@gmail.com>
++ *
++ * Licensed under the GNU Lesser General Public License Version 2.1
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
++ */
++
++#include "hif-backend-vendor.h"
++
++gboolean
++hif_validate_supported_source(const gchar* id)
++{
++	guint i, j, k, l;
++
++	const gchar *valid_sourcesect[] = { "",
++					  "-contrib",
++					  "-restricted",
++					  "-non-free",
++					  NULL };
++
++	/* OpenMandriva doesn't provide either "-debuginfo" nor "-source" repositories */
++	const gchar *valid_sourcetype[] = { "",
++					  NULL };
++
++	const gchar *valid_arch[] = { "x86_64",
++				      "i586",
++				      "armv7hl",
++				      "aarch64",
++				      NULL };
++
++	const gchar *valid[] = { "openmandriva",
++				 "updates",
++				 "testing",
++				 "cooker",
++				 NULL };
++
++	/* Iterate over the ID arrays to find a matching identifier */
++	for (i = 0; valid[i] != NULL; i++) {
++		for (j = 0; valid_arch[j] != NULL; j++) {
++			for (k = 0; valid_sourcesect[k] != NULL; k++) {
++				for (l = 0; valid_sourcetype[l] != NULL; l++) {
++					g_autofree gchar *source_entry = g_strconcat(valid[i], "-", valid_arch[j], valid_sourcesect[k], valid_sourcetype[l], NULL);
++					if (g_strcmp0 (id, source_entry) == 0) {
++						return TRUE;
++					}
++				}
++			}
++		}
++	}
++	return FALSE;
++}
+diff --git a/configure.ac b/configure.ac
+index d14c4603b..8efc9b252 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -408,8 +408,8 @@ fi
+ if test x$enable_hif = xyes; then
+ 	PKG_CHECK_MODULES(HIF, appstream-glib libhif >= 0.2.3)
+ 	AC_ARG_WITH(hif-vendor,
+-			[AS_HELP_STRING([--with-hif-vendor=<vendor>],[select a vendor configuration (fedora, mageia; default is fedora)])])
+-	if test "$with_hif_vendor" = "fedora" -o "$with_hif_vendor" = "mageia"; then
++			[AS_HELP_STRING([--with-hif-vendor=<vendor>],[select a vendor configuration (fedora, mageia, openmandriva; default is fedora)])])
++	if test "$with_hif_vendor" = "fedora" -o "$with_hif_vendor" = "mageia" -o "$with_hif_vendor" = "openmandriva"; then
+ 		with_hif_vendor="$with_hif_vendor"
+ 	else
+ 		with_hif_vendor="fedora"
+-- 
+2.11.0 (Apple Git-81)
+

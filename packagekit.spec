@@ -11,7 +11,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.5
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -24,6 +24,12 @@ Patch2:		PackageKit-1.1.0-urpmi-dispatcher_fix.patch
 Patch3:		PackageKit-1.1.0-urpmi_fixes.patch
 # armv7 compiler bug here i think
 Patch4:		autoptr-remove.patch
+
+# Hif backend for OpenMandriva (DO NOT TOUCH NUMBERING!)
+Patch1001:	1001-Revert-Remove-the-hif-backend.patch
+Patch1002:	1002-Revert-Automatically-use-the-dnf-backend-instead-of-.patch
+Patch1003:	1003-hif-Add-OpenMandriva-vendor.patch
+
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
 BuildRequires:	intltool
@@ -245,6 +251,10 @@ fonts from configured repositories using PackageKit.
 %patch4 -p1
 %endif
 
+%patch1001 -p1
+%patch1002 -p1
+%patch1003 -p1
+
 # (tpg) ugly workaround !
 # we have polkit 0.113 patched with few cherry-picks form upstream
 # so it is safe to call that 0.113 is a 0.114 here
@@ -266,8 +276,10 @@ sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 	--disable-alpm \
 	--disable-aptcc \
 	--disable-entropy \
-	--enable-dummy \
 	--disable-dnf \
+	--enable-dummy \
+	--enable-hif \
+	--with-hif-vendor=openmandriva \
 	--disable-pisi \
 	--disable-poldek \
 	--disable-portage \

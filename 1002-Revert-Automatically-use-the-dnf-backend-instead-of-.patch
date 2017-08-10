@@ -1,0 +1,36 @@
+From edbafafcad9b65f7a09d027e93eb4db28c523878 Mon Sep 17 00:00:00 2001
+From: Neal Gompa <ngompa13@gmail.com>
+Date: Wed, 9 Aug 2017 22:19:11 -0400
+Subject: [PATCH 1002/1003] Revert "Automatically use the dnf backend instead
+ of hif or hawkey"
+
+We want to be able to use the hif backend for PackageKit in
+OpenMandriva.
+
+This reverts commit 6f1b42e309634bc60bdc337e14975ad3a181d855.
+---
+ src/pk-backend.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/pk-backend.c b/src/pk-backend.c
+index 818808b5c..ce209d88f 100644
+--- a/src/pk-backend.c
++++ b/src/pk-backend.c
+@@ -506,11 +506,10 @@ pk_backend_load (PkBackend *backend, GError **error)
+ 	if (backend_name == NULL)
+ 		return FALSE;
+ 
+-	/* the "hawkey" and "hif" backends are superseded by "dnf" */
+-	if (g_strcmp0 (backend_name, "hawkey") == 0 ||
+-	    g_strcmp0 (backend_name, "hif") == 0) {
++	/* the "hawkey" backend was renamed to "hif" */
++	if (g_strcmp0 (backend_name, "hawkey") == 0) {
+ 		g_free (backend_name);
+-		backend_name = g_strdup ("dnf");
++		backend_name = g_strdup ("hif");
+ 	}
+ 
+ 	g_debug ("Trying to load : %s", backend_name);
+-- 
+2.11.0 (Apple Git-81)
+
