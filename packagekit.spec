@@ -30,6 +30,7 @@ Patch1002:	1002-Revert-Automatically-use-the-dnf-backend-instead-of-.patch
 Patch1003:	1003-hif-Add-OpenMandriva-vendor.patch
 
 BuildRequires:	autoconf
+BuildRequires:	autoconf-archive
 BuildRequires:	automake
 BuildRequires:	docbook-style-xsl
 BuildRequires:	gtk-doc
