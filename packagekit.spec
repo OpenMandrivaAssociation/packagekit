@@ -21,8 +21,6 @@ Patch1:		PackageKit-1.0.5-OpenMandriva-support.patch
 Patch2:		PackageKit-1.1.0-urpmi-dispatcher_fix.patch
 # add missing summary and fix size reported as 0
 Patch3:		PackageKit-1.1.0-urpmi_fixes.patch
-# armv7 compiler bug here i think
-Patch4:		autoptr-remove.patch
 # Teach PackageKit about OpenMandriva trees
 Patch5:		PackageKit-1.1.9-dnf-OpenMandriva-vendor.patch
 
@@ -242,15 +240,7 @@ fonts from configured repositories using PackageKit.
 #----------------------------------------------------------------------------
 
 %prep
-%setup -qn PackageKit-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%ifarch %arm
-%patch4 -p1
-%endif
-%patch5 -p1
+%autosetup -p1 -n PackageKit-%{version}
 
 # (tpg) ugly workaround !
 # we have polkit 0.113 patched with few cherry-picks form upstream
