@@ -9,7 +9,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.7
+Version:	1.1.9
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -23,11 +23,8 @@ Patch2:		PackageKit-1.1.0-urpmi-dispatcher_fix.patch
 Patch3:		PackageKit-1.1.0-urpmi_fixes.patch
 # armv7 compiler bug here i think
 Patch4:		autoptr-remove.patch
-
-# Hif backend for OpenMandriva (DO NOT TOUCH NUMBERING!)
-Patch1001:	1001-Revert-Remove-the-hif-backend.patch
-Patch1002:	1002-Revert-Automatically-use-the-dnf-backend-instead-of-.patch
-Patch1003:	1003-hif-Add-OpenMandriva-vendor.patch
+# Teach PackageKit about OpenMandriva trees
+Patch5:		PackageKit-1.1.9-dnf-OpenMandriva-vendor.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
@@ -38,6 +35,7 @@ BuildRequires:	intltool
 BuildRequires:	libtool
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(appstream-glib)
+BuildRequires:	pkgconfig(libdnf)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -51,7 +49,6 @@ BuildRequires:	pkgconfig(gstreamer-plugins-base-%{gstapi})
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
 BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	pkgconfig(libhif)
 BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(npapi-sdk)
 BuildRequires:	pkgconfig(NetworkManager)
@@ -94,8 +91,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
-%{_libdir}/packagekit-backend/libpk_backend_hif.so
-%{_libdir}/packagekit-backend/libpk_backend_urpmi.so
+%{_libdir}/packagekit-backend/libpk_backend_dnf.so
 %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
@@ -254,16 +250,15 @@ fonts from configured repositories using PackageKit.
 %ifarch %arm
 %patch4 -p1
 %endif
-
-%patch1001 -p1
-%patch1002 -p1
-%patch1003 -p1
+%patch5 -p1
 
 # (tpg) ugly workaround !
 # we have polkit 0.113 patched with few cherry-picks form upstream
 # so it is safe to call that 0.113 is a 0.114 here
 sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 
+# Rebuild auto* bits after patch 5
+NOCONFIGURE=1 ./autogen.sh
 
 %build
 %configure \
@@ -275,15 +270,15 @@ sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 	--enable-local \
 	--enable-gstreamer-plugin \
 	--enable-command-not-found \
-	--enable-urpmi \
+	--disable-urpmi \
 	--enable-cron \
 	--disable-alpm \
 	--disable-aptcc \
 	--disable-entropy \
-	--disable-dnf \
+	--enable-dnf \
+	--with-dnf-vendor=openmandriva \
 	--enable-dummy \
-	--enable-hif \
-	--with-hif-vendor=openmandriva \
+	--disable-hif \
 	--disable-pisi \
 	--disable-poldek \
 	--disable-portage \
