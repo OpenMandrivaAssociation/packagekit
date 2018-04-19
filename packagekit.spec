@@ -16,13 +16,8 @@ Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-Patch1:		PackageKit-1.0.5-OpenMandriva-support.patch
-# fix dispatcher hanging due to incorrect syntax
-Patch2:		PackageKit-1.1.0-urpmi-dispatcher_fix.patch
-# add missing summary and fix size reported as 0
-Patch3:		PackageKit-1.1.0-urpmi_fixes.patch
 # Teach PackageKit about OpenMandriva trees
-Patch5:		PackageKit-1.1.9-dnf-OpenMandriva-vendor.patch
+Patch1:		PackageKit-1.1.9-dnf-OpenMandriva-vendor.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
@@ -240,14 +235,14 @@ fonts from configured repositories using PackageKit.
 #----------------------------------------------------------------------------
 
 %prep
-%autosetup -p1 -n PackageKit-%{version}
+%autosetup -n PackageKit-%{version} -p1
 
 # (tpg) ugly workaround !
 # we have polkit 0.113 patched with few cherry-picks form upstream
 # so it is safe to call that 0.113 is a 0.114 here
 sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
 
-# Rebuild auto* bits after patch 5
+# Rebuild auto* bits after patch 1
 NOCONFIGURE=1 ./autogen.sh
 
 %build
@@ -281,10 +276,10 @@ NOCONFIGURE=1 ./autogen.sh
 	--with-systemdsystemunitdir=%{_systemunitdir} \
 	--enable-python3
 
-%make
+%make_build
 
 %install
-%makeinstall_std
+%make_install
 %find_lang PackageKit
 
 chmod -x %{buildroot}%{_sysconfdir}/cron.daily/*.cron
