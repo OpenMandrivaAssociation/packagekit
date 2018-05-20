@@ -9,15 +9,13 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.9
+Version:	1.1.10
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-# Teach PackageKit about OpenMandriva trees
-Patch1:		PackageKit-1.1.9-dnf-OpenMandriva-vendor.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
@@ -29,6 +27,7 @@ BuildRequires:	libtool
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(appstream-glib)
 BuildRequires:	pkgconfig(libdnf)
+BuildRequires:	pkgconfig(libsolv)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
