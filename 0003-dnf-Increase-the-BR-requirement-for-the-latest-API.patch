@@ -1,0 +1,25 @@
+From 86f303c077e1f68490f6f7ea3b79ecc96702cdf5 Mon Sep 17 00:00:00 2001
+From: Richard Hughes <richard@hughsie.com>
+Date: Wed, 27 Jun 2018 17:38:14 +0100
+Subject: [PATCH 3/3] dnf: Increase the BR requirement for the latest API
+
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 01df344bc..c01057448 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -392,7 +392,7 @@ AC_SUBST(DBUS_SYS_DIR)
+ AC_SUBST(DBUS_SERVICES_DIR)
+ 
+ if test x$enable_dnf = xyes; then
+-	PKG_CHECK_MODULES(DNF, appstream-glib libdnf >= 0.7.0)
++	PKG_CHECK_MODULES(DNF, appstream-glib libdnf >= 0.15.0)
+ 	AC_ARG_WITH(dnf-vendor,
+ 			[AS_HELP_STRING([--with-dnf-vendor=<vendor>],[select a vendor configuration (fedora, mageia, openmandriva; default is fedora)])])
+ 	if test "$with_dnf_vendor" = "fedora" -o "$with_dnf_vendor" = "mageia" -o "$with_dnf_vendor" = "openmandriva"; then
+-- 
+2.13.6
+
