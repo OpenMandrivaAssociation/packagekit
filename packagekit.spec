@@ -10,7 +10,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.1
+Version:	1.1.10
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -39,14 +39,11 @@ BuildRequires:	pkgconfig(gstreamer-plugins-base-%{gstapi})
 BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
 BuildRequires:	pkgconfig(gudev-1.0)
-BuildRequires:	pkgconfig(libsystemd-login)
-BuildRequires:	pkgconfig(libsystemd-journal)
-BuildRequires:	pkgconfig(npapi-sdk)
+BuildRequires:	pkgconfig(libsystemd)
 BuildRequires:	pkgconfig(NetworkManager)
 BuildRequires:	pkgconfig(nspr)
 BuildRequires:	pkgconfig(pango)
 BuildRequires:	pkgconfig(pangoft2)
-BuildRequires:	pkgconfig(pm-utils)
 BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(systemd)
@@ -235,6 +232,7 @@ fonts from configured repositories using PackageKit.
 %prep
 %setup -qn PackageKit-%{version}
 %apply_patches
+sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure
 
 %build
 %configure \
@@ -242,21 +240,14 @@ fonts from configured repositories using PackageKit.
 	--enable-gstreamer-plugin \
 	--enable-cron \
 	--disable-alpm \
-	--disable-apt \
-	--disable-box \
-	--disable-conary \
 	--enable-dummy \
-	--disable-opkg \
 	--disable-pisi \
 	--disable-poldek \
-	--disable-smart \
 	--enable-urpmi \
 	--enable-introspection \
-	--disable-yum \
 	--disable-zypp \
 	--disable-vala \
 	--with-systemdsystemunitdir=%{_unitdir} \
-	--with-mozilla-plugin-dir="%{_libdir}/mozilla/plugins" \
 	--enable-bash-completion \
 	--enable-local \
 	--enable-command-not-found \
