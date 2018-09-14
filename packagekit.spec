@@ -279,7 +279,7 @@ NOCONFIGURE=1 ./autogen.sh
 	--disable-yum \
 	--disable-zypp \
 	--disable-nix \
-	--with-systemdsystemunitdir=%{_systemunitdir} \
+	--with-systemdsystemunitdir=%{_unitdir} \
 	--enable-python3
 
 %make_build
