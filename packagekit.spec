@@ -10,15 +10,19 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.10
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-Patch1:		0001-Reflect-latest-changes-in-libdnf.patch
-Patch2:		0002-Allow-module-filtering.patch
-Patch3:		0003-dnf-Increase-the-BR-requirement-for-the-latest-API.patch
+# Upstream fixes for libdnf 0.15.0
+Patch0001:	0001-Reflect-latest-changes-in-libdnf.patch
+Patch0002:	0002-Allow-module-filtering.patch
+Patch0003:	0003-dnf-Increase-the-BR-requirement-for-the-latest-API.patch
+Patch0004:	0004-Add-additional-argument-to-the-dnf_sack_filter_modul.patch
+Patch0005:	0005-dnf-trivial-Add-missing-include.patch
+Patch0006:	0006-dnf-Avoid-using-deprecated-hy_goal_downgrade_to.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive

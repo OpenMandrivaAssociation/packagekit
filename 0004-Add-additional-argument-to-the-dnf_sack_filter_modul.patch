@@ -1,0 +1,28 @@
+From dbcab49e529eb9db20a4525107e37b3c255d5ccd Mon Sep 17 00:00:00 2001
+From: Daniel Mach <dmach@redhat.com>
+Date: Thu, 2 Aug 2018 13:44:17 +0200
+Subject: [PATCH] Add additional argument to the dnf_sack_filter_modules()
+ call.
+
+Libdnf API has changed and the function takes an additional argument: platformModule.
+It's set to NULL to trigger platform module auto-detection based on /etc/os-release.
+---
+ backends/dnf/pk-backend-dnf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/backends/dnf/pk-backend-dnf.c b/backends/dnf/pk-backend-dnf.c
+index 414a13f32..b6d575737 100644
+--- a/backends/dnf/pk-backend-dnf.c
++++ b/backends/dnf/pk-backend-dnf.c
+@@ -800,7 +800,7 @@ dnf_utils_create_sack_for_filters (PkBackendJob *job,
+ 			return NULL;
+ 	}
+ 
+-	dnf_sack_filter_modules (sack, dnf_context_get_repos (job_data->context), install_root);
++	dnf_sack_filter_modules (sack, dnf_context_get_repos (job_data->context), install_root, NULL);
+ 
+ 	/* save in cache */
+ 	g_mutex_lock (&priv->sack_mutex);
+-- 
+2.19.0
+
