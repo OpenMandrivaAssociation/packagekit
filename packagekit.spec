@@ -9,8 +9,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.11
-Release:	2
+Version:	1.1.12
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -51,7 +51,7 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(vapigen)
 BuildRequires:	pkgconfig(xt)
-
+Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
 
@@ -165,7 +165,8 @@ Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	gstreamer%{gstapi}-tools
 Requires:	%{name} = %{EVRD}
-Requires(post,postun):	update-alternatives
+Requires(post,postun):	rpm-helper
+Requires(post,postun):	chkconfig
 Provides:	gst-install-plugins-helper
 
 %description gstreamer-plugin
