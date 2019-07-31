@@ -10,12 +10,13 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.12
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
+Patch1:		packagekit-1.1.12-fix-omv-config.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
