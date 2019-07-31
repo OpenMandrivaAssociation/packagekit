@@ -10,13 +10,16 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.12
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 Patch1:		packagekit-1.1.12-fix-omv-config.patch
+Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-Do-not-trigger-an-inotity-event-when-the-AppStream-X.patch
+Patch3:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Don-t-override-DnfContext-s-release_ver-for-the-.patch
+Patch4:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Invalidate-the-sack-cache-after-downloading-new-.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
