@@ -32,7 +32,6 @@ BuildRequires:	libtool
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(appstream-glib)
 BuildRequires:	pkgconfig(libdnf)
-BuildRequires:	pkgconfig(libzypp)
 BuildRequires:	pkgconfig(libsolv)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
@@ -61,6 +60,9 @@ Requires:	%{name}-backend = %{EVRD}
 Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
+# For Zypp backend
+BuildRequires:	pkgconfig(libzypp)
+BuildRequires:	boost-devel
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
