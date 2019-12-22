@@ -10,7 +10,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.12
-Release:	4
+Release:	5
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
