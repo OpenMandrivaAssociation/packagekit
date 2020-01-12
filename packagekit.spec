@@ -9,17 +9,13 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.12
-Release:	6
+Version:	1.1.13
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-Patch1:		packagekit-1.1.12-fix-omv-config.patch
-Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-Do-not-trigger-an-inotity-event-when-the-AppStream-X.patch
-Patch3:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Don-t-override-DnfContext-s-release_ver-for-the-.patch
-Patch4:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Invalidate-the-sack-cache-after-downloading-new-.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
@@ -55,13 +51,15 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(vapigen)
 BuildRequires:	pkgconfig(xt)
-Requires:	%{name}-backend = %{EVRD}
 Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
 # Obsolete Zypp backend
 Obsoletes:	%{name}-backend-zypp < 1.1.12-6
 Conflicts:	%{name}-backend-zypp < %{EVRD}
+# Merge DNF backend package back into main package
+Obsoletes:	%{name}-backend-dnf < 1.1.13
+Provides:	%{name}-backend-dnf = %{EVRD}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -86,6 +84,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libexecdir}/pk-offline-update
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
+%{_libdir}/packagekit-backend/libpk_backend_dnf.so
 %{_libdir}/packagekit-backend/libpk_backend_test_fail.so
 %{_libdir}/packagekit-backend/libpk_backend_test_nop.so
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
@@ -106,18 +105,6 @@ packages in a secure way using a cross-distro, cross-architecture API.
 if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
     mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
 fi
-
-#----------------------------------------------------------------------------
-%package backend-dnf
-Summary:	DNF backend for PackageKit
-Group:		System/Configuration/Packaging
-Provides:	%{name}-backend = %{EVRD}
-
-%description backend-dnf
-DNF backend for PackageKit
-
-%files backend-dnf
-%{_libdir}/packagekit-backend/libpk_backend_dnf.so
 
 #----------------------------------------------------------------------------
 
