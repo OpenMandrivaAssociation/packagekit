@@ -10,7 +10,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.12
-Release:	5
+Release:	6
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -20,7 +20,6 @@ Patch1:		packagekit-1.1.12-fix-omv-config.patch
 Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-Do-not-trigger-an-inotity-event-when-the-AppStream-X.patch
 Patch3:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Don-t-override-DnfContext-s-release_ver-for-the-.patch
 Patch4:		https://src.fedoraproject.org/rpms/PackageKit/raw/master/f/0001-dnf-Invalidate-the-sack-cache-after-downloading-new-.patch
-Patch10:	packagekit-1.1.12-zypp-compile.patch
 
 BuildRequires:	autoconf
 BuildRequires:	autoconf-archive
@@ -60,9 +59,9 @@ Requires:	%{name}-backend = %{EVRD}
 Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
-# For Zypp backend
-BuildRequires:	pkgconfig(libzypp)
-BuildRequires:	boost-devel
+# Obsolete Zypp backend
+Obsoletes:	%{name}-backend-zypp < 1.1.12-6
+Conflicts:	%{name}-backend-zypp < %{EVRD}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -119,18 +118,6 @@ DNF backend for PackageKit
 
 %files backend-dnf
 %{_libdir}/packagekit-backend/libpk_backend_dnf.so
-
-#----------------------------------------------------------------------------
-%package backend-zypp
-Summary:	Zypp backend for PackageKit
-Group:		System/Configuration/Packaging
-Provides:	%{name}-backend = %{EVRD}
-
-%description backend-zypp
-Zypp backend for PackageKit
-
-%files backend-zypp
-%{_libdir}/packagekit-backend/libpk_backend_zypp.so
 
 #----------------------------------------------------------------------------
 
@@ -294,7 +281,6 @@ NOCONFIGURE=1 ./autogen.sh
 	--disable-entropy \
 	--enable-dnf \
 	--with-dnf-vendor=openmandriva \
-	--enable-zypp \
 	--enable-dummy \
 	--disable-hif \
 	--disable-pisi \
@@ -304,6 +290,7 @@ NOCONFIGURE=1 ./autogen.sh
 	--disable-katja \
 	--enable-introspection \
 	--disable-yum \
+	--disable-zypp \
 	--disable-nix \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--enable-python3
