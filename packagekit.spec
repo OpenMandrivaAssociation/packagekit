@@ -7,10 +7,15 @@
 %define girname %mklibname packagekitglib-gir %{gimajor}
 %define devname %mklibname %{name} -d
 
+# For libdnf minimal enforced dep
+%global min_ldnf_ver 0.43.1
+%global min_ldnf_verrel %{min_ldnf_ver}-1
+%global ldnfsomajor 2
+
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.1.13
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -26,8 +31,7 @@ BuildRequires:	intltool
 BuildRequires:	libtool
 BuildRequires:	xsltproc
 BuildRequires:	pkgconfig(appstream-glib)
-BuildRequires:	pkgconfig(libdnf)
-BuildRequires:	pkgconfig(libsolv)
+BuildRequires:	pkgconfig(libdnf) >= %{min_ldnf_ver}
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -60,6 +64,7 @@ Conflicts:	%{name}-backend-zypp < %{EVRD}
 # Merge DNF backend package back into main package
 Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
+Requires:	%{mklibname dnf %{ldnfsomajor}} >= %{min_ldnf_verrel}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
