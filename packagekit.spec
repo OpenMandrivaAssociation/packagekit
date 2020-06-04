@@ -14,22 +14,15 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.1.13
-Release:	2
+Version:	1.2.0
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 
-BuildRequires:	autoconf
-BuildRequires:	autoconf-archive
-BuildRequires:	automake
-BuildRequires:	docbook-style-xsl
-BuildRequires:	gtk-doc
-BuildRequires:	intltool
-BuildRequires:	libtool
-BuildRequires:	xsltproc
+BuildRequires:	meson
 BuildRequires:	pkgconfig(appstream-glib)
 BuildRequires:	pkgconfig(libdnf) >= %{min_ldnf_ver}
 BuildRequires:	pkgconfig(bash-completion)
@@ -111,6 +104,9 @@ if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
     mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
 fi
 
+# Remove leftover symlinks from /etc/systemd; the offline update service is	
+# instead now hooked into /usr/lib/systemd/system/system-update.target.wants	
+systemctl disable packagekit-offline-update.service > /dev/null 2>&1 || :
 #----------------------------------------------------------------------------
 
 %package -n %{libname}
@@ -248,49 +244,32 @@ fonts from configured repositories using PackageKit.
 %prep
 %autosetup -n PackageKit-%{version} -p1
 
-# (tpg) ugly workaround !
-# we have polkit 0.113 patched with few cherry-picks form upstream
-# so it is safe to call that 0.113 is a 0.114 here
-sed -i -e 's/polkit-gobject-1 >= 0.114/polkit-gobject-1 >= 0.113/' configure*
-
-# Rebuild auto* bits after patch 1
-NOCONFIGURE=1 ./autogen.sh
-
 %build
-%configure \
-	--disable-static \
-	--enable-vala=no \
-	--enable-systemd \
-	--enable-offline-update \
-	--enable-bash-completion \
-	--enable-local \
-	--enable-gstreamer-plugin \
-	--enable-command-not-found \
-	--disable-urpmi \
-	--enable-cron \
-	--disable-alpm \
-	--disable-aptcc \
-	--disable-entropy \
-	--enable-dnf \
-	--with-dnf-vendor=openmandriva \
-	--enable-dummy \
-	--disable-hif \
-	--disable-pisi \
-	--disable-poldek \
-	--disable-portage \
-	--disable-ports \
-	--disable-katja \
-	--enable-introspection \
-	--disable-yum \
-	--disable-zypp \
-	--disable-nix \
-	--with-systemdsystemunitdir=%{_unitdir} \
-	--enable-python3
-
-%make_build
+%meson \
+        -Dgtk_doc=true \
+        -Dpython_backend=false \
+        -Dpackaging_backend=dnf \
+        -Dlocal_checkout=false
+	
+%meson_build
 
 %install
-%make_install
+%meson_install
+
+# Create directories for downloaded appstream data	
+mkdir -p %{buildroot}%{_localstatedir}/cache/app-info/{icons,xmls}	
+
+# create a link that GStreamer will recognise	
+cd %{buildroot}%{_libexecdir} > /dev/null
+ln -s pk-gstreamer-install gst-install-plugins-helper	
+cd -
+	
+# enable packagekit-offline-updates.service here for now
+# https://github.com/hughsie/PackageKit/issues/401
+# https://bugzilla.redhat.com/show_bug.cgi?id=1833176
+mkdir -p %{buildroot}%{_unitdir}/system-update.target.wants/	
+ln -sf ../packagekit-offline-update.service %{buildroot}%{_unitdir}/system-update.target.wants/packagekit-offline-update.service
+
 %find_lang PackageKit
 
 chmod -x %{buildroot}%{_sysconfdir}/cron.daily/*.cron
