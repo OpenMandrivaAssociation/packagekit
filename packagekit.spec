@@ -24,6 +24,7 @@ Patch0:		packagekit-0.3.6-customize-vendor.patch
 
 BuildRequires:	meson
 BuildRequires:	xsltproc
+BuildRequires:	gtk-doc
 BuildRequires:	pkgconfig(appstream-glib)
 BuildRequires:	pkgconfig(libdnf) >= %{min_ldnf_ver}
 BuildRequires:	pkgconfig(bash-completion)
