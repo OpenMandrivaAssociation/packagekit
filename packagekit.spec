@@ -36,7 +36,6 @@ BuildRequires:	pkgconfig(gobject-introspection-1.0)
 BuildRequires:	pkgconfig(gstreamer-%{gstapi})
 BuildRequires:	pkgconfig(gstreamer-base-%{gstapi})
 BuildRequires:	pkgconfig(gstreamer-plugins-base-%{gstapi})
-BuildRequires:	pkgconfig(gtk+-2.0)
 BuildRequires:	pkgconfig(gtk+-3.0)
 BuildRequires:	pkgconfig(gudev-1.0)
 BuildRequires:	pkgconfig(libsystemd)
@@ -59,6 +58,7 @@ Conflicts:	%{name}-backend-zypp < %{EVRD}
 Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
 Requires:	%{mklibname dnf %{ldnfsomajor}} >= %{min_ldnf_verrel}
+Obsoletes:	%{name}-gtk2-module
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -211,21 +211,6 @@ using PackageKit.
 
 #----------------------------------------------------------------------------
 
-%package gtk2-module
-Summary:	Install fonts automatically using PackageKit
-Group:		System/Configuration/Packaging
-Requires:	%{name} = %{EVRD}
-Requires:	pango
-
-%description gtk2-module
-The PackageKit GTK2+ module allows any Pango application to install
-fonts from configured repositories using PackageKit.
-
-%files gtk2-module
-%{_libdir}/gtk-2.0/modules/libpk-gtk-module.so
-
-#----------------------------------------------------------------------------
-
 %package gtk3-module
 Summary:	Install fonts automatically using PackageKit
 Group:		System/Configuration/Packaging
@@ -248,6 +233,9 @@ fonts from configured repositories using PackageKit.
 %build
 %meson \
         -Dgtk_doc=true \
+	-Ddnf_vendor=openmandriva \
+	-Dsystemd=true \
+	-Dsystemdsystemunitdir=%{_unitdir} \
         -Dpython_backend=false \
         -Dpackaging_backend=dnf \
         -Dlocal_checkout=false
