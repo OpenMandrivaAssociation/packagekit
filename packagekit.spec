@@ -93,11 +93,9 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
-%{_unitdir}/system-update.target.wants
+%{_unitdir}/system-update.target.wants/packagekit-offline-update.service
 %dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
-%dir %{_var}/cache/PackageKit
-%dir %{_var}/cache/PackageKit/downloads
 
 %post
 # the job count used to live in /var/run, but it's now in /var/lib with the
@@ -106,9 +104,10 @@ if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
     mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
 fi
 
-# Remove leftover symlinks from /etc/systemd; the offline update service is	
-# instead now hooked into /usr/lib/systemd/system/system-update.target.wants	
+# Remove leftover symlinks from /etc/systemd; the offline update service is
+# instead now hooked into /usr/lib/systemd/system/system-update.target.wants
 systemctl disable packagekit-offline-update.service > /dev/null 2>&1 || :
+
 #----------------------------------------------------------------------------
 
 %package -n %{libname}
@@ -174,8 +173,6 @@ Summary:	Install GStreamer codecs using PackageKit
 Group:		System/Configuration/Packaging
 Requires:	gstreamer%{gstapi}-tools
 Requires:	%{name} = %{EVRD}
-Requires(post,postun):	rpm-helper
-Requires(post,postun):	chkconfig
 Provides:	gst-install-plugins-helper
 
 %description gstreamer-plugin
@@ -184,16 +181,7 @@ codecs from configured repositories using PackageKit.
 
 %files gstreamer-plugin
 %{_libexecdir}/pk-gstreamer-install
-
-%post gstreamer-plugin
-update-alternatives --install %{_libexecdir}/gst-install-plugins-helper gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install 10
-
-%postun gstreamer-plugin
-if [ "$1" = "0" ]; then
-    if ! [ -e %{_libexecdir}/pk-gstreamer-install ]; then
-        update-alternatives --remove gst-install-plugins-helper %{_libexecdir}/pk-gstreamer-install
-    fi
-fi
+%{_libexecdir}/gst-install-plugins-helper
 
 #----------------------------------------------------------------------------
 
@@ -246,18 +234,18 @@ fonts from configured repositories using PackageKit.
 %install
 %meson_install
 
-# Create directories for downloaded appstream data	
-mkdir -p %{buildroot}%{_localstatedir}/cache/app-info/{icons,xmls}	
+# Create directories for downloaded appstream data
+mkdir -p %{buildroot}%{_localstatedir}/cache/app-info/{icons,xmls}
 
-# create a link that GStreamer will recognise	
+# create a link that GStreamer will recognise
 cd %{buildroot}%{_libexecdir} > /dev/null
-ln -s pk-gstreamer-install gst-install-plugins-helper	
+ln -s pk-gstreamer-install gst-install-plugins-helper
 cd -
-	
+
 # enable packagekit-offline-updates.service here for now
 # https://github.com/hughsie/PackageKit/issues/401
 # https://bugzilla.redhat.com/show_bug.cgi?id=1833176
-mkdir -p %{buildroot}%{_unitdir}/system-update.target.wants/	
+mkdir -p %{buildroot}%{_unitdir}/system-update.target.wants/
 ln -sf ../packagekit-offline-update.service %{buildroot}%{_unitdir}/system-update.target.wants/packagekit-offline-update.service
 
 %find_lang PackageKit
