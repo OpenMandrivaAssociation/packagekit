@@ -150,6 +150,7 @@ Headers and libraries for PackageKit.
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 %{_datadir}/gir-1.0/PackageKitGlib-%{gimajor}.gir
+%{_datadir}/vala/vapi/packagekit-glib2.*
 
 #----------------------------------------------------------------------------
 
