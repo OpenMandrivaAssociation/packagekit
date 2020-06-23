@@ -15,7 +15,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.2.0
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -49,8 +49,7 @@ BuildRequires:	pkgconfig(polkit-gobject-1)
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(vapigen)
 BuildRequires:	pkgconfig(xt)
-BuildRequires:	%{_lib}ply-boot-client5
-Requires:	%{_lib}ply-boot-client5
+BuildRequires:	pkgconfig(ply-boot-client)
 Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
