@@ -15,7 +15,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.2.2
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -61,6 +61,7 @@ Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
 Requires:	%{mklibname dnf %{ldnfsomajor}} >= %{min_ldnf_verrel}
 Obsoletes:	%{name}-gtk2-module
+Requires:	shared-mime-info
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -70,7 +71,6 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %dir %{_sysconfdir}/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
-%config(noreplace) %{_sysconfdir}/PackageKit/CommandNotFound.conf
 %{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
 %{_datadir}/bash-completion/completions/pkcon
@@ -191,12 +191,14 @@ codecs from configured repositories using PackageKit.
 Summary:	Ask the user to install command line programs automatically
 Group:		System/Configuration/Packaging
 Requires:	%{name} = %{EVRD}
+Conflicts:	conflicts < 1.2.2-2
 
 %description command-not-found
 A simple helper that offers to install new packages on the command line
 using PackageKit.
 
 %files command-not-found
+%config(noreplace) %{_sysconfdir}/PackageKit/CommandNotFound.conf
 %{_sysconfdir}/profile.d/*
 %{_libexecdir}/pk-command-not-found
 
