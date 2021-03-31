@@ -14,8 +14,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.2.2
-Release:	2
+Version:	1.2.3
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -225,14 +225,14 @@ fonts from configured repositories using PackageKit.
 
 %build
 %meson \
-        -Dgtk_doc=true \
+	-Dgtk_doc=true \
 	-Ddnf_vendor=openmandriva \
 	-Dsystemd=true \
 	-Dsystemdsystemunitdir=%{_unitdir} \
-        -Dpython_backend=false \
-        -Dpackaging_backend=dnf \
-        -Dlocal_checkout=false
-	
+	-Dpython_backend=false \
+	-Dpackaging_backend=dnf \
+	-Dlocal_checkout=false
+
 %meson_build
 
 %install
