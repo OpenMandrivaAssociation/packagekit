@@ -15,7 +15,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.2.3
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -50,7 +50,6 @@ BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	pkgconfig(vapigen)
 BuildRequires:	pkgconfig(xt)
 BuildRequires:	pkgconfig(ply-boot-client)
-Requires(post):	rpm-helper
 Obsoletes:	%{name}-browser-plugin < 1.1.0-1
 Provides:	%{name}-browser-plugin = 1.1.0-1
 # Obsolete Zypp backend
@@ -99,12 +98,6 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 
 %post
-# the job count used to live in /var/run, but it's now in /var/lib with the
-# other persistent bits
-if [ -e %{_localstatedir}/run/PackageKit/job_count.dat ]; then
-    mv %{_localstatedir}/run/PackageKit/job_count.dat %{_localstatedir}/lib/PackageKit/job_count.dat
-fi
-
 # Remove leftover symlinks from /etc/systemd; the offline update service is
 # instead now hooked into /usr/lib/systemd/system/system-update.target.wants
 systemctl disable packagekit-offline-update.service > /dev/null 2>&1 || :
