@@ -14,7 +14,7 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.2.4
+Version:	1.2.5
 Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
@@ -90,7 +90,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
-%{_mandir}/man1/*
+%doc %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
 %{_unitdir}/system-update.target.wants/packagekit-offline-update.service
