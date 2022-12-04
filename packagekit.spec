@@ -14,8 +14,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.2.5
-Release:	2
+Version:	1.2.6
+Release:	1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
@@ -26,7 +26,8 @@ BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
 BuildRequires:	pkgconfig(appstream-glib)
-BuildRequires:	pkgconfig(libdnf) >= %{min_ldnf_ver}
+BuildRequires:	pkgconfig(libdnf) < 5.0
+BuildConflicts:	pkgconfig(libdnf) >= 5.0
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -68,6 +69,11 @@ packages in a secure way using a cross-distro, cross-architecture API.
 
 %files -f PackageKit.lang
 %dir %{_sysconfdir}/PackageKit
+%dir %{_localstatedir}/lib/PackageKit
+%dir %{_localstatedir}/cache/app-info
+%dir %{_localstatedir}/cache/app-info/icons
+%dir %{_localstatedir}/cache/app-info/xmls
+%dir %{_localstatedir}/cache/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
 %{_sysconfdir}/dbus-1/system.d/*.conf
@@ -94,7 +100,6 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
 %{_unitdir}/system-update.target.wants/packagekit-offline-update.service
-%dir %{_var}/lib/PackageKit
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 
 %post
@@ -230,6 +235,9 @@ fonts from configured repositories using PackageKit.
 
 %install
 %meson_install
+
+# Create cache dir
+mkdir -p %{buildroot}%{_localstatedir}/cache/PackageKit
 
 # Create directories for downloaded appstream data
 mkdir -p %{buildroot}%{_localstatedir}/cache/app-info/{icons,xmls}
