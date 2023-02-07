@@ -15,13 +15,15 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.2.6
-Release:	1
+Release:	2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-
+# (tpg) https://github.com/PackageKit/PackageKit/pull/404
+Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
+Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/rawhide/f/shutdown-on-idle.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
@@ -96,6 +98,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
+%{python_sitelib}/dnf-plugins/notify_packagekit.py
 %doc %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
