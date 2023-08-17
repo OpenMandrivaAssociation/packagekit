@@ -1,11 +1,12 @@
---- ./etc/Vendor.conf~	2008-10-05 19:35:08.000000000 +0200
-+++ ./etc/Vendor.conf	2008-10-12 15:22:23.000000000 +0200
+diff -up PackageKit-main/etc/Vendor.conf.1~ PackageKit-main/etc/Vendor.conf
+--- PackageKit-main/etc/Vendor.conf.1~	2023-08-17 17:04:10.227087696 +0200
++++ PackageKit-main/etc/Vendor.conf	2023-08-17 17:05:34.530908862 +0200
 @@ -12,7 +12,7 @@
  # If the value is set to 'none' then no link is shown.
  #
- # default=http://www.packagekit.org/pk-package-not-found.html
--DefaultUrl=http://www.packagekit.org/pk-package-not-found.html
-+DefaultUrl=https://www.openmandriva.org/
+ # default=https://www.freedesktop.org/software/PackageKit/pk-package-not-found.html
+-DefaultUrl=https://www.freedesktop.org/software/PackageKit/pk-package-not-found.html
++DefaultUrl=https://openmandriva.org/
  
  # The URL which is shown to the user when a codec could not be found.
  # It should explain why certain codecs cannot be used, and perhaps show

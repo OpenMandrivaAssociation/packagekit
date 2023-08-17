@@ -12,19 +12,23 @@
 %global min_ldnf_verrel %{min_ldnf_ver}-1
 %global ldnfsomajor 2
 
+%define git 20230817
+
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.2.6
-Release:	4
+Version:	1.2.7
+Release:	%{?git:0.%{git}.}1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		http://www.packagekit.org
+%if 0%{?git:1}
+Source0:	https://github.com/PackageKit/PackageKit/archive/refs/heads/main.tar.gz#/PackageKit-%{git}.tar.gz
+%else
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
+%endif
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # (tpg) https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
-Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/rawhide/f/shutdown-on-idle.patch
-Patch3:		https://github.com/PackageKit/PackageKit/commit/a249d2bce7d40d51f007f89a6a0e9f90bbd3ec08.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
@@ -79,9 +83,9 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %dir %{_localstatedir}/cache/PackageKit
 %config(noreplace) %{_sysconfdir}/PackageKit/PackageKit.conf
 %config(noreplace) %{_sysconfdir}/PackageKit/Vendor.conf
-%{_sysconfdir}/dbus-1/system.d/*.conf
 %{_bindir}/*
 %{_datadir}/bash-completion/completions/pkcon
+%{_datadir}/dbus-1/system.d/*.conf
 %{_datadir}/dbus-1/interfaces/*.xml
 %{_datadir}/dbus-1/system-services/*.service
 %{_datadir}/gtk-doc/html/PackageKit
@@ -90,6 +94,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules
 %{_libexecdir}/packagekitd
 %{_libexecdir}/packagekit-direct
+%{_libexecdir}/packagekit-dnf-refresh-repo
 %{_libexecdir}/pk-offline-update
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
@@ -100,6 +105,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
 %{python_sitelib}/dnf-plugins/notify_packagekit.py
+%optional %{python_sitelib}/dnf-plugins/__pycache__/*
 %doc %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
@@ -223,7 +229,7 @@ fonts from configured repositories using PackageKit.
 #----------------------------------------------------------------------------
 
 %prep
-%autosetup -n PackageKit-%{version} -p1
+%autosetup -n PackageKit-%{?git:main}%{!?git:%{version}} -p1
 
 %build
 %meson \
