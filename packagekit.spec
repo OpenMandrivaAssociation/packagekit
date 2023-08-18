@@ -12,7 +12,7 @@
 %global min_ldnf_verrel %{min_ldnf_ver}-1
 %global ldnfsomajor 2
 
-%define git 20230817
+%define git 20230818
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
@@ -29,6 +29,7 @@ Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{ve
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # (tpg) https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
+Patch2:		packagekit-remove-assert-crashing-discover.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc

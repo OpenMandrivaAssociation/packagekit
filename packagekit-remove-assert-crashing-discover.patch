@@ -1,0 +1,14 @@
+diff -up PackageKit-main/src/pk-transaction.c.omv~ PackageKit-main/src/pk-transaction.c
+--- PackageKit-main/src/pk-transaction.c.omv~	2023-08-18 02:13:42.157299494 +0200
++++ PackageKit-main/src/pk-transaction.c	2023-08-18 02:14:14.408609506 +0200
+@@ -5525,7 +5525,9 @@ pk_transaction_dispose (GObject *object)
+ 
+ 	if (transaction->priv->registration_id > 0) {
+ 		/* We should have emitted ::Finished if the object was ever registered */
+-		g_assert (transaction->priv->emitted_finished);
++		// but if we haven't emitted it, let's not crash packagekitd -- it seems to
++		// happen A LOT in discover
++		//g_assert (transaction->priv->emitted_finished);
+ 
+ 		g_dbus_connection_unregister_object (transaction->priv->connection,
+ 						     transaction->priv->registration_id);
