@@ -12,7 +12,7 @@
 %global min_ldnf_verrel %{min_ldnf_ver}-1
 %global ldnfsomajor 2
 
-%define git 20230818
+%undefine git
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
