@@ -29,11 +29,11 @@ Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{ve
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # (tpg) https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
-Patch2:		packagekit-remove-assert-crashing-discover.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
-BuildRequires:	pkgconfig(appstream-glib)
+BuildRequires:	appstream
+BuildRequires:	pkgconfig(appstream)
 BuildRequires:	pkgconfig(libdnf) < 5.0
 BuildConflicts:	pkgconfig(libdnf) >= 5.0
 BuildRequires:	pkgconfig(bash-completion)
@@ -111,6 +111,7 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
 %{_unitdir}/system-update.target.wants/packagekit-offline-update.service
+%{_datadir}/metainfo/org.freedesktop.packagekit.metainfo.xml
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 
 %post
