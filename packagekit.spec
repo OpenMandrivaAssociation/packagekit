@@ -20,7 +20,7 @@ Version:	1.2.8
 Release:	%{?git:0.%{git}.}2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
-Url:		http://www.packagekit.org
+Url:		https://www.packagekit.org
 %if 0%{?git:1}
 Source0:	https://github.com/PackageKit/PackageKit/archive/refs/heads/main.tar.gz#/PackageKit-%{git}.tar.gz
 %else
