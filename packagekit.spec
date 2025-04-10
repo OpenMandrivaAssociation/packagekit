@@ -34,8 +34,8 @@ BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
 BuildRequires:	appstream
 BuildRequires:	pkgconfig(appstream)
-BuildRequires:	pkgconfig(libdnf) < 5.0
-BuildConflicts:	pkgconfig(libdnf) >= 5.0
+BuildRequires:	pkgconfig(libdnf)
+BuildRequires:	pkgconfig(libdnf5)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
