@@ -32,6 +32,7 @@ BuildRequires:	appstream
 BuildRequires:	pkgconfig(appstream)
 BuildRequires:	pkgconfig(libdnf)
 BuildRequires:	pkgconfig(libdnf5)
+BuildRequires:	pkgconfig(sdbus-c++)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
