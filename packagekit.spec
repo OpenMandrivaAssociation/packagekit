@@ -30,6 +30,7 @@ BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
 BuildRequires:	appstream
 BuildRequires:	pkgconfig(appstream)
+BuildRequires:	pkgconfig(libdnf)
 BuildRequires:	pkgconfig(libdnf5)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
