@@ -7,17 +7,12 @@
 %define girname %mklibname packagekitglib-gir %{gimajor}
 %define devname %mklibname %{name} -d
 
-# For libdnf minimal enforced dep
-%global min_ldnf_ver 0.43.1
-%global min_ldnf_verrel %{min_ldnf_ver}-1
-%global ldnfsomajor 2
-
 %undefine git
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.2.8
-Release:	%{?git:0.%{git}.}2
+Version:	1.3.1
+Release:	%{?git:0.%{git}.}1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		https://www.packagekit.org
@@ -29,13 +24,13 @@ Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{ve
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # (tpg) https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
+Patch2:		packagekit-1.3.1-sdbus-2.0.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
 BuildRequires:	appstream
 BuildRequires:	pkgconfig(appstream)
-BuildRequires:	pkgconfig(libdnf) < 5.0
-BuildConflicts:	pkgconfig(libdnf) >= 5.0
+BuildRequires:	pkgconfig(libdnf5)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(cairo)
 BuildRequires:	pkgconfig(fontconfig)
@@ -67,7 +62,6 @@ Conflicts:	%{name}-backend-zypp < %{EVRD}
 # Merge DNF backend package back into main package
 Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
-Requires:	%{mklibname dnf %{ldnfsomajor}} >= %{min_ldnf_verrel}
 Obsoletes:	%{name}-gtk2-module
 Requires:	shared-mime-info
 
@@ -113,6 +107,8 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_unitdir}/system-update.target.wants/packagekit-offline-update.service
 %{_datadir}/metainfo/org.freedesktop.packagekit.metainfo.xml
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
+%{_sysconfdir}/dnf/libdnf5-plugins/notify_packagekit.conf
+%{_libdir}/libdnf5/plugins/notify_packagekit.so
 
 %post
 # Remove leftover symlinks from /etc/systemd; the offline update service is
