@@ -12,7 +12,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.3.1
-Release:	%{?git:0.%{git}.}1
+Release:	%{?git:0.%{git}.}2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		https://www.packagekit.org
@@ -109,6 +109,16 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_unitdir}/system-update.target.wants/packagekit-offline-update.service
 %{_datadir}/metainfo/org.freedesktop.packagekit.metainfo.xml
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
+
+
+%package -n dnf-plugin-notify-packagekit
+Summary: DNF plugin for notifying PackageKit of changes
+Group: System
+
+%description -n dnf-plugin-notify-packagekit
+DNF plugin for notifying PackageKit of changes
+
+%files -n dnf-plugin-notify-packagekit
 %{_sysconfdir}/dnf/libdnf5-plugins/notify_packagekit.conf
 %{_libdir}/libdnf5/plugins/notify_packagekit.so
 
