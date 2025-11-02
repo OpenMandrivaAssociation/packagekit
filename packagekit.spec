@@ -11,8 +11,8 @@
 
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
-Version:	1.3.1
-Release:	%{?git:0.%{git}.}2
+Version:	1.3.2
+Release:	%{?git:0.%{git}.}1
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		https://www.packagekit.org
@@ -24,7 +24,7 @@ Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{ve
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # (tpg) https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
-Patch2:		packagekit-1.3.1-sdbus-2.0.patch
+#Patch2:		packagekit-1.3.1-sdbus-2.0.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
