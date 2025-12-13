@@ -22,8 +22,8 @@ Source0:	https://github.com/PackageKit/PackageKit/archive/refs/heads/main.tar.gz
 Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{version}.tar.xz
 %endif
 Patch0:		packagekit-0.3.6-customize-vendor.patch
-# (tpg) https://github.com/PackageKit/PackageKit/pull/404
-Patch1:		https://patch-diff.githubusercontent.com/raw/PackageKit/PackageKit/pull/404.patch
+# Based on https://github.com/PackageKit/PackageKit/pull/404
+Patch1:		404.patch
 #Patch2:		packagekit-1.3.1-sdbus-2.0.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
