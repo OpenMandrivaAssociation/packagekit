@@ -12,7 +12,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.3.3
-Release:	%{?git:0.%{git}.}1
+Release:	%{?git:0.%{git}.}2
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		https://www.packagekit.org
@@ -25,12 +25,14 @@ Patch0:		packagekit-0.3.6-customize-vendor.patch
 # Based on https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		404.patch
 #Patch2:		packagekit-1.3.1-sdbus-2.0.patch
+# DNF 5 support
+# https://github.com/PackageKit/PackageKit/pull/931
+Patch2:		https://src.fedoraproject.org/fork/ngompa/rpms/PackageKit/raw/dnf5/f/PackageKit-1.3.3-Initial-DNF5-Backend.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
 BuildRequires:	appstream
 BuildRequires:	pkgconfig(appstream)
-BuildRequires:	pkgconfig(libdnf)
 BuildRequires:	pkgconfig(libdnf5)
 BuildRequires:	pkgconfig(sdbus-c++)
 BuildRequires:	pkgconfig(bash-completion)
@@ -66,6 +68,7 @@ Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
 Obsoletes:	%{name}-gtk2-module
 Requires:	shared-mime-info
+Recommends:	dnf-plugin-notify-packagekit = %{EVRD}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -91,18 +94,15 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_datadir}/polkit-1/rules.d/org.freedesktop.packagekit.rules
 %{_libexecdir}/packagekitd
 %{_libexecdir}/packagekit-direct
-%{_libexecdir}/packagekit-dnf-refresh-repo
 %{_libexecdir}/pk-offline-update
 %dir %{_libdir}/packagekit-backend
 %{_libdir}/packagekit-backend/libpk_backend_dummy.so
-%{_libdir}/packagekit-backend/libpk_backend_dnf.so
+%{_libdir}/packagekit-backend/libpk_backend_dnf5.so
 %{_libdir}/packagekit-backend/libpk_backend_test_fail.so
 %{_libdir}/packagekit-backend/libpk_backend_test_nop.so
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
-%{python_sitelib}/dnf-plugins/notify_packagekit.py
-%optional %{python_sitelib}/dnf-plugins/__pycache__/*
 %doc %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
@@ -248,7 +248,7 @@ fonts from configured repositories using PackageKit.
 	-Dsystemd=true \
 	-Dsystemdsystemunitdir=%{_unitdir} \
 	-Dpython_backend=false \
-	-Dpackaging_backend=dnf \
+	-Dpackaging_backend=dnf5 \
 	-Dlocal_checkout=false
 
 %meson_build
