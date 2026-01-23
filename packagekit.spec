@@ -12,7 +12,7 @@
 Summary:	A DBUS packaging abstraction layer
 Name:		packagekit
 Version:	1.3.3
-Release:	%{?git:0.%{git}.}2
+Release:	%{?git:0.%{git}.}3
 License:	GPLv2+
 Group:		System/Configuration/Packaging
 Url:		https://www.packagekit.org
@@ -24,10 +24,11 @@ Source0:	http://www.freedesktop.org/software/PackageKit/releases/PackageKit-%{ve
 Patch0:		packagekit-0.3.6-customize-vendor.patch
 # Based on https://github.com/PackageKit/PackageKit/pull/404
 Patch1:		404.patch
-#Patch2:		packagekit-1.3.1-sdbus-2.0.patch
 # DNF 5 support
 # https://github.com/PackageKit/PackageKit/pull/931
-Patch2:		https://src.fedoraproject.org/fork/ngompa/rpms/PackageKit/raw/dnf5/f/PackageKit-1.3.3-Initial-DNF5-Backend.patch
+Patch2:		https://src.fedoraproject.org/rpms/PackageKit/raw/rawhide/f/PackageKit-1.3.3-Initial-DNF5-Backend.patch
+# Alias dnf to dnf5 in PK
+Patch3:		https://src.fedoraproject.org/rpms/PackageKit/raw/rawhide/f/PackageKit-alias-dnf-to-dnf5.patch
 BuildRequires:	meson
 BuildRequires:	xsltproc
 BuildRequires:	gtk-doc
@@ -68,7 +69,9 @@ Obsoletes:	%{name}-backend-dnf < 1.1.13
 Provides:	%{name}-backend-dnf = %{EVRD}
 Obsoletes:	%{name}-gtk2-module
 Requires:	shared-mime-info
-Recommends:	dnf-plugin-notify-packagekit = %{EVRD}
+# This is gone now so obsolete it
+Obsoletes:	dnf-plugin-notify-packagekit < 1.3.3-3
+Conflicts:	dnf-plugin-notify-packagekit < %{EVRD}
 
 %description
 PackageKit is a DBUS abstraction layer that allows the session user to manage
@@ -103,6 +106,8 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_libdir}/packagekit-backend/libpk_backend_test_spawn.so
 %{_libdir}/packagekit-backend/libpk_backend_test_succeed.so
 %{_libdir}/packagekit-backend/libpk_backend_test_thread.so
+%{_libdir}/rpm-plugins/notify_packagekit.so
+%{_rpmmacrodir}/macros.transaction_notify_packagekit
 %doc %{_mandir}/man1/*
 %{_unitdir}/packagekit.service
 %{_unitdir}/packagekit-offline-update.service
@@ -110,17 +115,6 @@ packages in a secure way using a cross-distro, cross-architecture API.
 %{_datadir}/metainfo/org.freedesktop.packagekit.metainfo.xml
 %ghost %verify(not md5 size mtime) %{_var}/lib/PackageKit/transactions.db
 
-
-%package -n dnf-plugin-notify-packagekit
-Summary: DNF plugin for notifying PackageKit of changes
-Group: System
-
-%description -n dnf-plugin-notify-packagekit
-DNF plugin for notifying PackageKit of changes
-
-%files -n dnf-plugin-notify-packagekit
-%{_sysconfdir}/dnf/libdnf5-plugins/notify_packagekit.conf
-%{_libdir}/libdnf5/plugins/notify_packagekit.so
 
 %post
 # Remove leftover symlinks from /etc/systemd; the offline update service is

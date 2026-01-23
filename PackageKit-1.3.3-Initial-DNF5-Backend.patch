@@ -1,17 +1,17 @@
-From cd4421bd0014ab52378d4e80bd282ae0a3a72560 Mon Sep 17 00:00:00 2001
+From 02c96b6d49025921d7b6757e11bc2102c92ff8f5 Mon Sep 17 00:00:00 2001
 From: Neal Gompa <neal@gompa.dev>
 Date: Tue, 30 Dec 2025 19:44:19 -0500
-Subject: [PATCH] backends: Initial implementation of the DNF5 backend
+Subject: [PATCH 1/4] backends: Initial implementation of the DNF5 backend
 
-This also moves over the libdnf5 notify packagekit plugin to the
-source tree for the DNF5 backend.
+This provides a complete implementation for PackageKit to leverage
+libdnf5 as the backing package management interface for RPM-based
+operating systems.
 ---
  AUTHORS                                       |   3 +
- backends/dnf/meson.build                      |  29 +-
  backends/dnf5/README.md                       |  19 +
- backends/dnf5/dnf5-backend-thread.cpp         | 705 ++++++++++++++++++
+ backends/dnf5/dnf5-backend-thread.cpp         | 722 ++++++++++++++++++
  backends/dnf5/dnf5-backend-thread.hpp         |  28 +
- backends/dnf5/dnf5-backend-utils.cpp          | 577 ++++++++++++++
+ backends/dnf5/dnf5-backend-utils.cpp          | 593 ++++++++++++++
  backends/dnf5/dnf5-backend-utils.hpp          |  91 +++
  backends/dnf5/dnf5-backend-vendor-fedora.cpp  |  35 +
  backends/dnf5/dnf5-backend-vendor-mageia.cpp  |  47 ++
@@ -19,12 +19,10 @@ source tree for the DNF5 backend.
  .../dnf5/dnf5-backend-vendor-opensuse.cpp     |  44 ++
  backends/dnf5/dnf5-backend-vendor-rosa.cpp    |  44 ++
  backends/dnf5/dnf5-backend-vendor.hpp         |  25 +
- backends/dnf5/meson.build                     |  59 ++
- backends/{dnf => dnf5}/notify_packagekit.conf |   0
- backends/{dnf => dnf5}/notify_packagekit.cpp  |   0
- backends/dnf5/pk-backend-dnf5.cpp             | 317 ++++++++
+ backends/dnf5/meson.build                     |  27 +
+ backends/dnf5/pk-backend-dnf5.cpp             | 367 +++++++++
  meson_options.txt                             |  15 +-
- 18 files changed, 2057 insertions(+), 28 deletions(-)
+ 15 files changed, 2106 insertions(+), 1 deletion(-)
  create mode 100644 backends/dnf5/README.md
  create mode 100644 backends/dnf5/dnf5-backend-thread.cpp
  create mode 100644 backends/dnf5/dnf5-backend-thread.hpp
@@ -37,8 +35,6 @@ source tree for the DNF5 backend.
  create mode 100644 backends/dnf5/dnf5-backend-vendor-rosa.cpp
  create mode 100644 backends/dnf5/dnf5-backend-vendor.hpp
  create mode 100644 backends/dnf5/meson.build
- rename backends/{dnf => dnf5}/notify_packagekit.conf (100%)
- rename backends/{dnf => dnf5}/notify_packagekit.cpp (100%)
  create mode 100644 backends/dnf5/pk-backend-dnf5.cpp
 
 diff --git a/AUTHORS b/AUTHORS
@@ -55,60 +51,6 @@ index 3f624dce2..aa4c6dcbb 100644
  Backend: eopkg
      Joey Riches <josephriches@gmail.com> <joey@getsol.us>
  
-diff --git a/backends/dnf/meson.build b/backends/dnf/meson.build
-index 6efde8f12..906afd0b9 100644
---- a/backends/dnf/meson.build
-+++ b/backends/dnf/meson.build
-@@ -1,10 +1,7 @@
- appstream_dep = dependency('appstream', version: '>=0.14.0')
- dnf_dep = dependency('libdnf', version: '>=0.43.1')
--dnf5_dep = dependency('libdnf5')
--libdnf5_version = dnf5_dep.version().split('.')
- rpm_dep = dependency('rpm')
--sdbus_cpp_dep = dependency('sdbus-c++')
--sdbus_cpp_version = sdbus_cpp_dep.version().split('.')
-+
- c_args = ['-DG_LOG_DOMAIN="PackageKit-DNF"']
- 
- if meson.get_compiler('c').has_function('hy_query_get_advisory_pkgs', prefix: '#include <libdnf/hy-query.h>', dependencies: dnf_dep)
-@@ -19,36 +16,14 @@ if python_package_dir == ''
- endif
- python_package_dir = join_paths(python_package_dir, 'dnf-plugins')
- 
-+
- install_data(
-   'notify_packagekit.py',
-   install_dir: join_paths(python_package_dir),
- )
- 
- add_languages('cpp', native: false)
--shared_module(
--  'notify_packagekit',
--  'notify_packagekit.cpp',
--  cpp_args: [
--    '-std=c++20',
--    '-DLIBDNF5_VERSION_MAJOR=' + libdnf5_version[0],
--    '-DLIBDNF5_VERSION_MINOR=' + libdnf5_version[1],
--    '-DLIBDNF5_VERSION_PATCH=' + libdnf5_version[2],
--    '-DSDBUSCPP_VERSION_MAJOR=' + sdbus_cpp_version[0],
--  ],
--  include_directories: packagekit_glib2_includes,
--  dependencies: [
--    dnf5_dep,
--    sdbus_cpp_dep,
--  ],
--  name_prefix: '',
--  install: true,
--  install_dir: get_option('libdir') / 'libdnf5/plugins/',
--)
- 
--install_data(
--  'notify_packagekit.conf',
--  install_dir: get_option('sysconfdir') / 'dnf/libdnf5-plugins/'
--)
- 
- shared_module(
-   'pk_backend_dnf',
 diff --git a/backends/dnf5/README.md b/backends/dnf5/README.md
 new file mode 100644
 index 000000000..276123d6d
@@ -136,10 +78,10 @@ index 000000000..276123d6d
 +* How to access comps data
 diff --git a/backends/dnf5/dnf5-backend-thread.cpp b/backends/dnf5/dnf5-backend-thread.cpp
 new file mode 100644
-index 000000000..2f32c3bf6
+index 000000000..30e71fe00
 --- /dev/null
 +++ b/backends/dnf5/dnf5-backend-thread.cpp
-@@ -0,0 +1,705 @@
+@@ -0,0 +1,722 @@
 +/* -*- Mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2025 Neal Gompa <neal@gompa.dev>
@@ -487,7 +429,7 @@ index 000000000..2f32c3bf6
 +			}
 +		}
 +	} catch (const std::exception &e) {
-+		pk_backend_job_error_code (job, PK_ERROR_ENUM_INTERNAL_ERROR, "%s", e.what());
++		pk_backend_job_error_code (job, PK_ERROR_ENUM_TRANSACTION_ERROR, "%s", e.what());
 +	}
 +	pk_backend_job_finished (job);
 +}
@@ -619,15 +561,32 @@ index 000000000..2f32c3bf6
 +		}
 +		
 +		if (pk_bitfield_contain (transaction_flags, PK_TRANSACTION_FLAG_ENUM_SIMULATE)) {
++			std::set<std::string> continuing_names;
++			for (const auto &item : trans.get_transaction_packages()) {
++				auto action = item.get_action();
++				if (action == libdnf5::transaction::TransactionItemAction::UPGRADE ||
++				    action == libdnf5::transaction::TransactionItemAction::DOWNGRADE ||
++				    action == libdnf5::transaction::TransactionItemAction::REINSTALL) {
++					continuing_names.insert(item.get_package().get_name());
++				}
++			}
++
 +			for (const auto &item : trans.get_transaction_packages()) {
 +				auto action = item.get_action();
 +				PkInfoEnum info = PK_INFO_ENUM_UNKNOWN;
-+				if (action == libdnf5::transaction::TransactionItemAction::INSTALL || action == libdnf5::transaction::TransactionItemAction::UPGRADE) info = PK_INFO_ENUM_INSTALLING;
-+				else if (action == libdnf5::transaction::TransactionItemAction::REMOVE || action == libdnf5::transaction::TransactionItemAction::REPLACED) info = PK_INFO_ENUM_REMOVING;
++				if (action == libdnf5::transaction::TransactionItemAction::INSTALL) info = PK_INFO_ENUM_INSTALLING;
++				else if (action == libdnf5::transaction::TransactionItemAction::UPGRADE) info = PK_INFO_ENUM_UPDATING;
++				else if (action == libdnf5::transaction::TransactionItemAction::REMOVE) info = PK_INFO_ENUM_REMOVING;
 +				else if (action == libdnf5::transaction::TransactionItemAction::REINSTALL) info = PK_INFO_ENUM_REINSTALLING;
 +				else if (action == libdnf5::transaction::TransactionItemAction::DOWNGRADE) info = PK_INFO_ENUM_DOWNGRADING;
++				else if (action == libdnf5::transaction::TransactionItemAction::REPLACED) {
++					if (continuing_names.find(item.get_package().get_name()) == continuing_names.end()) {
++						info = PK_INFO_ENUM_OBSOLETING;
++					}
++				}
 +				
-+				dnf5_emit_pkg(job, item.get_package(), info);
++				if (info != PK_INFO_ENUM_UNKNOWN)
++					dnf5_emit_pkg(job, item.get_package(), info);
 +			}
 +			pk_backend_job_finished (job);
 +			return;
@@ -681,7 +640,7 @@ index 000000000..2f32c3bf6
 +		dnf5_setup_base (priv);
 +		
 +	} catch (const std::exception &e) {
-+		pk_backend_job_error_code (job, PK_ERROR_ENUM_INTERNAL_ERROR, "%s", e.what());
++		pk_backend_job_error_code (job, PK_ERROR_ENUM_TRANSACTION_ERROR, "%s", e.what());
 +	}
 +	pk_backend_job_finished (job);
 +}
@@ -840,7 +799,7 @@ index 000000000..2f32c3bf6
 +		}
 +	} catch (const std::exception &e) {
 +		g_warning("Exception in dnf5_repo_thread: %s", e.what());
-+		pk_backend_job_error_code (job, PK_ERROR_ENUM_INTERNAL_ERROR, "%s", e.what());
++		pk_backend_job_error_code (job, PK_ERROR_ENUM_TRANSACTION_ERROR, "%s", e.what());
 +	}
 +	g_debug("Calling pk_backend_job_finished in dnf5_repo_thread");
 +	pk_backend_job_finished (job);
@@ -881,10 +840,10 @@ index 000000000..99c683150
 +void dnf5_repo_thread(PkBackendJob *job, GVariant *params, gpointer user_data);
 diff --git a/backends/dnf5/dnf5-backend-utils.cpp b/backends/dnf5/dnf5-backend-utils.cpp
 new file mode 100644
-index 000000000..cab64d9d8
+index 000000000..8ae910fc2
 --- /dev/null
 +++ b/backends/dnf5/dnf5-backend-utils.cpp
-@@ -0,0 +1,577 @@
+@@ -0,0 +1,593 @@
 +/* -*- Mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2025 Neal Gompa <neal@gompa.dev>
@@ -909,6 +868,7 @@ index 000000000..cab64d9d8
 +#include <packagekit-glib2/pk-common-private.h>
 +#include <packagekit-glib2/pk-update-detail.h>
 +#include <libdnf5/conf/config_parser.hpp>
++#include <libdnf5/conf/const.hpp>
 +#include <libdnf5/logger/logger.hpp>
 +#include <libdnf5/rpm/arch.hpp>
 +#include <libdnf5/repo/package_downloader.hpp>
@@ -956,6 +916,21 @@ index 000000000..cab64d9d8
 +			g_autofree gchar *cache_dir = g_build_filename (root, "/var/cache/PackageKit", distro_version, "metadata", NULL);
 +			g_debug("Using cachedir: %s", cache_dir);
 +			config.get_cachedir_option().set(libdnf5::Option::Priority::COMMANDLINE, cache_dir);
++		}
++
++		auto &optional_metadata_types = config.get_optional_metadata_types_option();
++		auto &optional_metadata_types_setting = optional_metadata_types.get_value();
++		if (!optional_metadata_types_setting.contains(libdnf5::METADATA_TYPE_ALL)) {
++			// Ensure all required repodata types are downloaded
++			if(!optional_metadata_types_setting.contains(libdnf5::METADATA_TYPE_COMPS)) {
++				optional_metadata_types.add_item(libdnf5::Option::Priority::RUNTIME, libdnf5::METADATA_TYPE_COMPS);
++			}
++			if(!optional_metadata_types_setting.contains(libdnf5::METADATA_TYPE_UPDATEINFO)) {
++				optional_metadata_types.add_item(libdnf5::Option::Priority::RUNTIME, libdnf5::METADATA_TYPE_UPDATEINFO);
++			}
++			if(!optional_metadata_types_setting.contains(libdnf5::METADATA_TYPE_APPSTREAM)) {
++				optional_metadata_types.add_item(libdnf5::Option::Priority::RUNTIME, libdnf5::METADATA_TYPE_APPSTREAM);
++			}
 +		}
 +		
 +		// Always assume yes to avoid interactive prompts failing the transaction
@@ -1839,50 +1814,15 @@ index 000000000..3c9d254b4
 +bool dnf5_validate_supported_repo(const std::string &id);
 diff --git a/backends/dnf5/meson.build b/backends/dnf5/meson.build
 new file mode 100644
-index 000000000..903b01b09
+index 000000000..efb2b6be3
 --- /dev/null
 +++ b/backends/dnf5/meson.build
-@@ -0,0 +1,59 @@
-+
-+pk_backend_dnf5_deps = [
-+  dependency('libdnf5'),
-+  dependency('sdbus-c++'),
-+  packagekit_glib2_dep,
-+]
+@@ -0,0 +1,27 @@
 +
 +add_languages('cpp', native: false)
 +
-+dnf5_dep = dependency('libdnf5', version: '>=5.2.0.17')
++dnf5_dep = dependency('libdnf5', version: '>=5.2.17.0')
 +libdnf5_version = dnf5_dep.version().split('.')
-+sdbus_cpp_dep = dependency('sdbus-c++')
-+sdbus_cpp_version = sdbus_cpp_dep.version().split('.')
-+
-+shared_module(
-+  'notify_packagekit',
-+  'notify_packagekit.cpp',
-+  cpp_args: [
-+    '-std=c++20',
-+    '-DLIBDNF5_VERSION_MAJOR=' + libdnf5_version[0],
-+    '-DLIBDNF5_VERSION_MINOR=' + libdnf5_version[1],
-+    '-DLIBDNF5_VERSION_PATCH=' + libdnf5_version[2],
-+    '-DSDBUSCPP_VERSION_MAJOR=' + sdbus_cpp_version[0],
-+  ],
-+  include_directories: packagekit_glib2_includes,
-+  dependencies: [
-+    dnf5_dep,
-+    sdbus_cpp_dep,
-+  ],
-+  name_prefix: '',
-+  install: true,
-+  install_dir: get_option('libdir') / 'libdnf5/plugins/',
-+)
-+
-+install_data(
-+  'notify_packagekit.conf',
-+  install_dir: get_option('sysconfdir') / 'dnf/libdnf5-plugins/'
-+)
-+
-+
 +
 +shared_module(
 +  'pk_backend_dnf5',
@@ -1890,7 +1830,10 @@ index 000000000..903b01b09
 +  'dnf5-backend-utils.cpp',
 +  'dnf5-backend-thread.cpp',
 +  'dnf5-backend-vendor-@0@.cpp'.format(get_option('dnf_vendor')),
-+  dependencies: pk_backend_dnf5_deps,
++  dependencies: [
++    dnf5_dep,
++    packagekit_glib2_dep,
++  ],
 +  cpp_args: [
 +    '-std=c++20',
 +    '-DLIBDNF5_VERSION_MAJOR=' + libdnf5_version[0],
@@ -1902,20 +1845,12 @@ index 000000000..903b01b09
 +  install: true,
 +  install_dir: pk_plugin_dir,
 +)
-diff --git a/backends/dnf/notify_packagekit.conf b/backends/dnf5/notify_packagekit.conf
-similarity index 100%
-rename from backends/dnf/notify_packagekit.conf
-rename to backends/dnf5/notify_packagekit.conf
-diff --git a/backends/dnf/notify_packagekit.cpp b/backends/dnf5/notify_packagekit.cpp
-similarity index 100%
-rename from backends/dnf/notify_packagekit.cpp
-rename to backends/dnf5/notify_packagekit.cpp
 diff --git a/backends/dnf5/pk-backend-dnf5.cpp b/backends/dnf5/pk-backend-dnf5.cpp
 new file mode 100644
-index 000000000..622916de3
+index 000000000..421ba61d1
 --- /dev/null
 +++ b/backends/dnf5/pk-backend-dnf5.cpp
-@@ -0,0 +1,317 @@
+@@ -0,0 +1,367 @@
 +/* -*- Mode: C++; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*-
 + *
 + * Copyright (C) 2025 Neal Gompa <neal@gompa.dev>
@@ -2066,151 +2001,201 @@ index 000000000..622916de3
 +void
 +pk_backend_search_names (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^as)", filters, values), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", filters, values);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_search_details (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^as)", filters, values), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", filters, values);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_search_files (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^as)", filters, values), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", filters, values);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_packages (PkBackend *backend, PkBackendJob *job, PkBitfield filters)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t)", filters), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t)", filters);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_resolve (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^as)", filters, package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", filters, package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_details (PkBackend *backend, PkBackendJob *job, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as)", package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as)", package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_files (PkBackend *backend, PkBackendJob *job, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as)", package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as)", package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_repo_list (PkBackend *backend, PkBackendJob *job, PkBitfield filters)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t)", filters), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t)", filters);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_updates (PkBackend *backend, PkBackendJob *job, PkBitfield filters)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t)", filters), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t)", filters);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_what_provides (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **search)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^as)", filters, search), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", filters, search);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_depends_on (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **package_ids, gboolean recursive)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^asb)", filters, package_ids, recursive), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^asb)", filters, package_ids, recursive);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_required_by (PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **package_ids, gboolean recursive)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(t^asb)", filters, package_ids, recursive), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^asb)", filters, package_ids, recursive);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_update_detail (PkBackend *backend, PkBackendJob *job, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as)", package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as)", package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_download_packages (PkBackend *backend, PkBackendJob *job, gchar **package_ids, const gchar *directory)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as&s)", package_ids, directory), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as&s)", package_ids, directory);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_details_local (PkBackend *backend, PkBackendJob *job, gchar **files)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as)", files), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as)", files);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_get_files_local (PkBackend *backend, PkBackendJob *job, gchar **files)
 +{
-+	pk_backend_job_thread_create (job, dnf5_query_thread, g_variant_new ("(^as)", files), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(^as)", files);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_query_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_install_packages (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t^as)", transaction_flags, package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", transaction_flags, package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_remove_packages (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, gchar **package_ids, gboolean allow_deps, gboolean autoremove)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t^asbb)", transaction_flags, package_ids, allow_deps, autoremove), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^asbb)", transaction_flags, package_ids, allow_deps, autoremove);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_update_packages (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, gchar **package_ids)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t^as)", transaction_flags, package_ids), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", transaction_flags, package_ids);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_install_files (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, gchar **full_paths)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t^as)", transaction_flags, full_paths), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t^as)", transaction_flags, full_paths);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_upgrade_system (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, const gchar *distro_id, PkUpgradeKindEnum upgrade_kind)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t&su)", transaction_flags, distro_id, upgrade_kind), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t&su)", transaction_flags, distro_id, upgrade_kind);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_repair_system (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags)
 +{
-+	pk_backend_job_thread_create (job, dnf5_transaction_thread, g_variant_new ("(t)", transaction_flags), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t)", transaction_flags);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_transaction_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_repo_enable (PkBackend *backend, PkBackendJob *job, const gchar *repo_id, gboolean enabled)
 +{
-+	pk_backend_job_thread_create (job, dnf5_repo_thread, g_variant_new ("(sb)", repo_id, enabled), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(sb)", repo_id, enabled);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_repo_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_repo_set_data (PkBackend *backend, PkBackendJob *job, const gchar *repo_id, const gchar *parameter, const gchar *value)
 +{
-+	pk_backend_job_thread_create (job, dnf5_repo_thread, g_variant_new ("(sss)", repo_id, parameter, value), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(sss)", repo_id, parameter, value);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_repo_thread, NULL, NULL);
 +}
 +
 +void
 +pk_backend_repo_remove (PkBackend *backend, PkBackendJob *job, PkBitfield transaction_flags, const gchar *repo_id, gboolean autoremove)
 +{
-+	pk_backend_job_thread_create (job, dnf5_repo_thread, g_variant_new ("(t&sb)", transaction_flags, repo_id, autoremove), NULL);
++	g_autoptr(GVariant) params = g_variant_new ("(t&sb)", transaction_flags, repo_id, autoremove);
++	pk_backend_job_set_parameters (job, g_steal_pointer (&params));
++	pk_backend_job_thread_create (job, dnf5_repo_thread, NULL, NULL);
 +}
 +
 +void
@@ -2259,6 +2244,386 @@ index 7136d1b40..0dbfbd232 100644
      value : ['dummy'],
      description : 'The name of the backend to use'
  )
+-- 
+2.52.0
+
+
+From 512df952c4c53a6671dc68ac1a0909ff1f7c4480 Mon Sep 17 00:00:00 2001
+From: Gordon Messmer <gordon.messmer@gmail.com>
+Date: Fri, 2 Jan 2026 21:50:18 -0800
+Subject: [PATCH 2/4] dnf5: Invalidate context when receiving updates-changed
+ signal
+
+This uses the PkBackend object's updates-changed signal to invalidate
+the dnf5 base object and reload all data from the system.
+---
+ backends/dnf5/pk-backend-dnf5.cpp | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/backends/dnf5/pk-backend-dnf5.cpp b/backends/dnf5/pk-backend-dnf5.cpp
+index 421ba61d1..cc5c3f118 100644
+--- a/backends/dnf5/pk-backend-dnf5.cpp
++++ b/backends/dnf5/pk-backend-dnf5.cpp
+@@ -87,6 +87,19 @@ pk_backend_get_roles (PkBackend *backend)
+ 		-1);
+ }
+ 
++static void
++pk_backend_context_invalidate_cb (PkBackend *backend, PkBackend *backend_data)
++{
++	g_return_if_fail (PK_IS_BACKEND (backend));
++
++	g_debug ("invalidating dnf5 base");
++
++	PkBackendDnf5Private *priv = (PkBackendDnf5Private *) pk_backend_get_user_data (backend);
++	g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&priv->mutex);
++
++	dnf5_setup_base (priv);
++}
++
+ void
+ pk_backend_initialize (GKeyFile *conf, PkBackend *backend)
+ {
+@@ -119,6 +132,8 @@ pk_backend_initialize (GKeyFile *conf, PkBackend *backend)
+ 
+ 	try {
+ 		dnf5_setup_base (priv);
++		g_signal_connect (backend, "updates-changed",
++				  G_CALLBACK (pk_backend_context_invalidate_cb), backend);
+ 	} catch (const std::exception &e) {
+ 		g_warning ("Init failed: %s", e.what());
+ 	}
+-- 
+2.52.0
+
+
+From abd71b176412682ff16ba0e5bce03faea5d4570b Mon Sep 17 00:00:00 2001
+From: Gordon Messmer <gordon.messmer@gmail.com>
+Date: Fri, 9 Jan 2026 12:57:53 -0800
+Subject: [PATCH 3/4] dnf5: Inhibit handling duplicate/redundant change
+ notifications
+
+This ensures we do not handle potentially duplicate change notifications from
+multiple producers within the same transaction to avoid wasting cycles.
+---
+ backends/dnf5/dnf5-backend-thread.cpp |  7 ++++++-
+ backends/dnf5/dnf5-backend-utils.hpp  |  1 +
+ backends/dnf5/pk-backend-dnf5.cpp     | 20 ++++++++++++++++++++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
+
+diff --git a/backends/dnf5/dnf5-backend-thread.cpp b/backends/dnf5/dnf5-backend-thread.cpp
+index 30e71fe00..8ad82caa3 100644
+--- a/backends/dnf5/dnf5-backend-thread.cpp
++++ b/backends/dnf5/dnf5-backend-thread.cpp
+@@ -550,8 +550,11 @@ dnf5_transaction_thread (PkBackendJob *job, GVariant *params, gpointer user_data
+ 			std::string msg;
+ 			for (const auto &p : trans.get_transaction_problems()) msg += p + "; ";
+ 			pk_backend_job_error_code (job, PK_ERROR_ENUM_TRANSACTION_ERROR, "Transaction failed: %s", msg.c_str());
++		} else {
++			// Update timestamp to inhibit notifications from our own transaction
++			priv->last_notification_timestamp = g_get_monotonic_time ();
+ 		}
+-		
++
+ 		// Post-transaction base re-initialization to ensure state consistency
+ 		dnf5_setup_base (priv);
+ 		
+@@ -707,6 +710,8 @@ dnf5_repo_thread (PkBackendJob *job, GVariant *params, gpointer user_data)
+ 					pk_backend_job_error_code (job, PK_ERROR_ENUM_TRANSACTION_ERROR, "Transaction failed: %s", msg.c_str());
+ 				} else {
+ 					g_debug("Transaction completed successfully");
++					// Update timestamp to inhibit notifications from our own transaction
++					priv->last_notification_timestamp = g_get_monotonic_time ();
+ 				}
+ 				dnf5_setup_base (priv);
+ 			} else {
+diff --git a/backends/dnf5/dnf5-backend-utils.hpp b/backends/dnf5/dnf5-backend-utils.hpp
+index 4b4d0c23a..39ae9b30d 100644
+--- a/backends/dnf5/dnf5-backend-utils.hpp
++++ b/backends/dnf5/dnf5-backend-utils.hpp
+@@ -37,6 +37,7 @@ typedef struct {
+ 	std::unique_ptr<libdnf5::Base> base;
+ 	GKeyFile *conf;
+ 	GMutex mutex;
++	gint64 last_notification_timestamp;
+ } PkBackendDnf5Private;
+ 
+ void dnf5_setup_base(PkBackendDnf5Private *priv, gboolean refresh = FALSE, gboolean force = FALSE, const char *releasever = nullptr);
+diff --git a/backends/dnf5/pk-backend-dnf5.cpp b/backends/dnf5/pk-backend-dnf5.cpp
+index cc5c3f118..06dc0b772 100644
+--- a/backends/dnf5/pk-backend-dnf5.cpp
++++ b/backends/dnf5/pk-backend-dnf5.cpp
+@@ -87,6 +87,22 @@ pk_backend_get_roles (PkBackend *backend)
+ 		-1);
+ }
+ 
++static int
++pk_backend_dnf5_inhibit_notify (PkBackend *backend)
++{
++	PkBackendDnf5Private *priv = (PkBackendDnf5Private *) pk_backend_get_user_data (backend);
++	gint64 current_time = g_get_monotonic_time ();
++	gint64 time_since_last_notification = current_time - priv->last_notification_timestamp;
++
++	/* Inhibit notifications for 5 seconds to avoid processing our own RPM transactions */
++	if (time_since_last_notification < 5 * G_USEC_PER_SEC) {
++		g_debug ("Ignoring signal: too soon after last notification (%" G_GINT64_FORMAT " µs)",
++			 time_since_last_notification);
++		return 1;
++	}
++	return 0;
++}
++
+ static void
+ pk_backend_context_invalidate_cb (PkBackend *backend, PkBackend *backend_data)
+ {
+@@ -94,10 +110,13 @@ pk_backend_context_invalidate_cb (PkBackend *backend, PkBackend *backend_data)
+ 
+ 	g_debug ("invalidating dnf5 base");
+ 
++	if (pk_backend_dnf5_inhibit_notify (backend)) return;
++
+ 	PkBackendDnf5Private *priv = (PkBackendDnf5Private *) pk_backend_get_user_data (backend);
+ 	g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&priv->mutex);
+ 
+ 	dnf5_setup_base (priv);
++	priv->last_notification_timestamp = g_get_monotonic_time ();
+ }
+ 
+ void
+@@ -119,6 +138,7 @@ pk_backend_initialize (GKeyFile *conf, PkBackend *backend)
+ 
+ 	g_mutex_init (&priv->mutex);
+ 	priv->conf = g_key_file_ref (conf);
++	priv->last_notification_timestamp = 0;
+ 
+ 	pk_backend_set_user_data (backend, priv);
+ 
+-- 
+2.52.0
+
+
+From 96da00e0a78886c3e779416cfc29fdcd71002d43 Mon Sep 17 00:00:00 2001
+From: Gordon Messmer <gordon.messmer@gmail.com>
+Date: Fri, 9 Jan 2026 12:48:30 -0800
+Subject: [PATCH 4/4] dnf5: Add rpm plugin to notify PackageKit when
+ transactions complete
+
+This specifically is used to ensure that even if PackageKit
+is asleep, it will wake up via D-Bus to refresh its caches.
+---
+ .../dnf5/macros.transaction_notify_packagekit |   1 +
+ backends/dnf5/meson.build                     |  29 ++++
+ backends/dnf5/notify_packagekit.cpp           | 156 ++++++++++++++++++
+ 3 files changed, 186 insertions(+)
+ create mode 100644 backends/dnf5/macros.transaction_notify_packagekit
+ create mode 100644 backends/dnf5/notify_packagekit.cpp
+
+diff --git a/backends/dnf5/macros.transaction_notify_packagekit b/backends/dnf5/macros.transaction_notify_packagekit
+new file mode 100644
+index 000000000..3dedf51bf
+--- /dev/null
++++ b/backends/dnf5/macros.transaction_notify_packagekit
+@@ -0,0 +1 @@
++%__transaction_notify_packagekit    %{__plugindir}/notify_packagekit.so
+diff --git a/backends/dnf5/meson.build b/backends/dnf5/meson.build
+index efb2b6be3..236220744 100644
+--- a/backends/dnf5/meson.build
++++ b/backends/dnf5/meson.build
+@@ -25,3 +25,32 @@ shared_module(
+   install: true,
+   install_dir: pk_plugin_dir,
+ )
++
++# Build rpm plugin for notifying PackageKit
++rpm_dep = dependency('rpm', version: '>=4.20')
++sdbus_cpp_dep = dependency('sdbus-c++')
++sdbus_cpp_version = sdbus_cpp_dep.version().split('.')
++
++rpm_plugindir = rpm_dep.get_variable(pkgconfig: 'rpmplugindir')
++rpm_macrosdir = rpm_dep.get_variable(pkgconfig: 'rpmhome') + '/macros.d'
++
++shared_module(
++  'notify_packagekit',
++  'notify_packagekit.cpp',
++  cpp_args: [
++    '-std=c++20',
++    '-DSDBUSCPP_VERSION_MAJOR=' + sdbus_cpp_version[0],
++  ],
++  dependencies: [
++    rpm_dep,
++    sdbus_cpp_dep,
++  ],
++  name_prefix: '',
++  install: true,
++  install_dir: rpm_plugindir,
++)
++
++install_data(
++  'macros.transaction_notify_packagekit',
++  install_dir: rpm_macrosdir,
++)
+diff --git a/backends/dnf5/notify_packagekit.cpp b/backends/dnf5/notify_packagekit.cpp
+new file mode 100644
+index 000000000..403e07298
+--- /dev/null
++++ b/backends/dnf5/notify_packagekit.cpp
+@@ -0,0 +1,156 @@
++// RPM plugin to notify PackageKit that the system changed
++// Copyright (C) 2026 Gordon Messmer <gordon.messmer@gmail.com>
++// SPDX-License-Identifier: GPL-2.0-or-later
++//
++// Based on https://github.com/rpm-software-management/rpm/blob/master/plugins/dbus_announce.c
++// Copyright (C) 2021 by Red Hat, Inc.
++// SPDX-License-Identifier: GPL-2.0-or-later
++//
++// and backends/dnf/notify_packagekit.cpp
++// Copyright (C) 2024 Alessandro Astone <ales.astone@gmail.com>
++// SPDX-License-Identifier: LGPL-2.1-or-later
++
++#include <rpm/rpmlog.h>
++#include <rpm/rpmstring.h>
++#include <rpm/rpmts.h>
++#include <rpm/rpmplugin.h>
++
++#include <sdbus-c++/sdbus-c++.h>
++
++#include <cstdlib>
++#include <memory>
++
++using namespace std::literals;
++
++namespace {
++
++constexpr const char * PLUGIN_NAME = "notify_packagekit";
++
++struct NotifyPackagekitData {
++    std::unique_ptr<sdbus::IConnection> connection{nullptr};
++    std::unique_ptr<sdbus::IProxy> proxy{nullptr};
++
++    void close_bus() noexcept {
++        proxy.reset();
++        connection.reset();
++    }
++
++    rpmRC open_dbus(rpmPlugin plugin, rpmts ts) noexcept {
++        // Already open
++        if (connection) {
++            return RPMRC_OK;
++        }
++
++        // ...don't notify on test transactions
++        if (rpmtsFlags(ts) & (RPMTRANS_FLAG_TEST | RPMTRANS_FLAG_BUILD_PROBS)) {
++            return RPMRC_OK;
++        }
++
++        // ...don't notify on chroot transactions
++        if (!rstreq(rpmtsRootDir(ts), "/")) {
++            return RPMRC_OK;
++        }
++
++        try {
++#if SDBUSCPP_VERSION_MAJOR >= 2
++            auto serviceName = sdbus::ServiceName{"org.freedesktop.PackageKit"};
++            auto objectPath = sdbus::ObjectPath{"/org/freedesktop/PackageKit"};
++#else
++            auto serviceName = "org.freedesktop.PackageKit"s;
++            auto objectPath = "/org/freedesktop/PackageKit"s;
++#endif
++
++            connection = sdbus::createSystemBusConnection();
++            proxy = sdbus::createProxy(
++                std::move(connection),
++                std::move(serviceName),
++                std::move(objectPath),
++                sdbus::dont_run_event_loop_thread);
++        } catch (const sdbus::Error & e) {
++            rpmlog(RPMLOG_DEBUG,
++                   "%s plugin: Error connecting to dbus (%s)\n",
++                   PLUGIN_NAME, e.what());
++            connection.reset();
++            proxy.reset();
++        }
++
++        return RPMRC_OK;
++    }
++
++    rpmRC send_state_changed() noexcept {
++        if (!proxy) {
++            return RPMRC_OK;
++        }
++
++        try {
++#if SDBUSCPP_VERSION_MAJOR >= 2
++            auto interfaceName = sdbus::InterfaceName{"org.freedesktop.PackageKit"};
++            auto methodName = sdbus::MethodName{"StateHasChanged"};
++#else
++            auto interfaceName = "org.freedesktop.PackageKit"s;
++            auto methodName = "StateHasChanged"s;
++#endif
++
++            auto method = proxy->createMethodCall(std::move(interfaceName), std::move(methodName));
++            method << "posttrans";
++
++#if SDBUSCPP_VERSION_MAJOR >= 2
++            proxy->callMethodAsync(method, sdbus::with_future);
++#else
++            proxy->callMethod(method, sdbus::with_future);
++#endif
++        } catch (const sdbus::Error & e) {
++            rpmlog(RPMLOG_WARNING,
++                   "%s plugin: Error sending message (%s)\n",
++                   PLUGIN_NAME, e.what());
++        }
++
++        return RPMRC_OK;
++    }
++};
++
++}  // namespace
++
++// C linkage for RPM plugin interface
++extern "C" {
++
++static rpmRC notify_packagekit_init(rpmPlugin plugin, rpmts ts) {
++    auto * state = new (std::nothrow) NotifyPackagekitData();
++    if (state == nullptr) {
++        return RPMRC_FAIL;
++    }
++    rpmPluginSetData(plugin, state);
++    return RPMRC_OK;
++}
++
++static void notify_packagekit_cleanup(rpmPlugin plugin) {
++    auto * state = static_cast<NotifyPackagekitData *>(rpmPluginGetData(plugin));
++    delete state;
++}
++
++static rpmRC notify_packagekit_tsm_pre(rpmPlugin plugin, rpmts ts) {
++    auto * state = static_cast<NotifyPackagekitData *>(rpmPluginGetData(plugin));
++    return state->open_dbus(plugin, ts);
++}
++
++static rpmRC notify_packagekit_tsm_post(rpmPlugin plugin, rpmts ts, int res) {
++    auto * state = static_cast<NotifyPackagekitData *>(rpmPluginGetData(plugin));
++    return state->send_state_changed();
++}
++
++struct rpmPluginHooks_s notify_packagekit_hooks = {
++    .init = notify_packagekit_init,
++    .cleanup = notify_packagekit_cleanup,
++    .tsm_pre = notify_packagekit_tsm_pre,
++    .tsm_post = notify_packagekit_tsm_post,
++    .psm_pre = NULL,
++    .psm_post = NULL,
++    .scriptlet_pre = NULL,
++    .scriptlet_fork_post = NULL,
++    .scriptlet_post = NULL,
++    .fsm_file_pre = NULL,
++    .fsm_file_post = NULL,
++    .fsm_file_prepare = NULL,
++};
++
++}  // extern "C"
 -- 
 2.52.0
 
